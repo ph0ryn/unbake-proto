@@ -40,10 +40,18 @@ export class MethodDescriptor {
    * Returns the method signature information for RPC formatting.
    */
   getSignature(): MethodSignature {
+    if (!this.inputType) {
+      throw new Error(`Method "${this.name}" has no inputType`);
+    }
+
+    if (!this.outputType) {
+      throw new Error(`Method "${this.name}" has no outputType`);
+    }
+
     return {
       clientStreaming: this.clientStreaming ?? false,
-      inputType: this.inputType ?? "",
-      outputType: this.outputType ?? "",
+      inputType: this.inputType,
+      outputType: this.outputType,
       serverStreaming: this.serverStreaming ?? false,
     };
   }

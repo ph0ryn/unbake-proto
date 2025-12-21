@@ -72,7 +72,7 @@ export class FieldDescriptor {
       case 3:
         return "repeated ";
       default:
-        return "";
+        throw new Error(`Unexpected field label: ${this.label}`);
     }
   }
 
@@ -100,13 +100,21 @@ export class FieldDescriptor {
       case 10:
         return "group"; // Deprecated
       case 11:
-        return this.typeName || "message"; // MESSAGE
+        if (!this.typeName) {
+          throw new Error(`MESSAGE type field "${this.name}" has no typeName`);
+        }
+
+        return this.typeName;
       case 12:
         return "bytes";
       case 13:
         return "uint32";
       case 14:
-        return this.typeName || "enum"; // ENUM
+        if (!this.typeName) {
+          throw new Error(`ENUM type field "${this.name}" has no typeName`);
+        }
+
+        return this.typeName;
       case 15:
         return "sfixed32";
       case 16:
@@ -116,7 +124,7 @@ export class FieldDescriptor {
       case 18:
         return "sint64";
       default:
-        return "unknown";
+        throw new Error(`Unexpected field type: ${this.type}`);
     }
   }
 }
