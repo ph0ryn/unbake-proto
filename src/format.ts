@@ -28,6 +28,9 @@ export class Formatter {
       this.emptyLine();
     }
 
+    // File options
+    this.printFileOptions();
+
     // Imports
     for (const dep of this.descriptor.dependency) {
       this.line(`import "${dep}";`);
@@ -197,6 +200,18 @@ export class Formatter {
   private emptyLine() {
     if (this.buffer.length > 0 && this.buffer[this.buffer.length - 1] !== "") {
       this.buffer.push("");
+    }
+  }
+
+  private printFileOptions() {
+    const options = this.descriptor.getFileOptions();
+
+    for (const opt of options) {
+      this.line(`option ${opt.name} = ${opt.value};`);
+    }
+
+    if (options.length > 0) {
+      this.emptyLine();
     }
   }
 }
