@@ -1,4 +1,4 @@
-import type { ServiceDescriptorProto, MethodDescriptorProto } from "@bufbuild/protobuf/wkt";
+import type { MethodDescriptorProto, ServiceDescriptorProto } from "@bufbuild/protobuf/wkt";
 
 export class ServiceDescriptor {
   name?: string;
@@ -10,6 +10,13 @@ export class ServiceDescriptor {
     this.method = proto.method.map((met) => new MethodDescriptor(met));
     this.options = proto.options;
   }
+}
+
+export interface MethodSignature {
+  clientStreaming: boolean;
+  inputType: string;
+  outputType: string;
+  serverStreaming: boolean;
 }
 
 export class MethodDescriptor {
@@ -27,5 +34,17 @@ export class MethodDescriptor {
     this.options = proto.options;
     this.clientStreaming = proto.clientStreaming;
     this.serverStreaming = proto.serverStreaming;
+  }
+
+  /**
+   * Returns the method signature information for RPC formatting.
+   */
+  getSignature(): MethodSignature {
+    return {
+      clientStreaming: this.clientStreaming ?? false,
+      inputType: this.inputType ?? "",
+      outputType: this.outputType ?? "",
+      serverStreaming: this.serverStreaming ?? false,
+    };
   }
 }

@@ -4,6 +4,16 @@ import { OneofDescriptor } from "./oneof.js";
 
 import type { DescriptorProto } from "@bufbuild/protobuf/wkt";
 
+export interface OneofGroup {
+  name: string;
+  fields: FieldDescriptor[];
+}
+
+export interface FieldGroups {
+  regularFields: FieldDescriptor[];
+  oneofGroups: OneofGroup[];
+}
+
 export class MessageType {
   name?: string;
   field: FieldDescriptor[];
@@ -28,5 +38,44 @@ export class MessageType {
     this.options = proto.options;
     this.reservedRange = proto.reservedRange;
     this.reservedName = proto.reservedName;
+  }
+
+  /**
+   * Groups fields into regular fields and oneof groups.
+   * Proto3 optional fields (synthetic oneofs) are treated as regular fields.
+   */
+  getFieldGroups(): FieldGroups {
+    const oneofFields = new Map<number, FieldDescriptor[]>();
+    const regularFields: FieldDescriptor[] = [];
+
+    this.field.forEach((fld) => {
+      // Synthetic oneofs (proto3_optional) are skipped
+      if (fld.oneofIndex !== undefined && !fld.proto3Optional) {
+        if (!oneofFields.has(fld.oneofIndex)) {
+          oneofFields.set(fld.oneofIndex, []);
+        }
+
+        oneofFields.get(fld.oneofIndex)?.push(fld);
+      } else {
+        regularFields.push(fld);
+      }
+    });
+
+    const oneofGroups: OneofGroup[] = [];
+
+    if (this.oneofDecl) {
+      this.oneofDecl.forEach((oneof, index) => {
+        const fields = oneofFields.get(index);
+
+        if (fields && fields.length > 0) {
+          oneofGroups.push({
+            fields,
+            name: oneof.name ?? "",
+          });
+        }
+      });
+    }
+
+    return { oneofGroups, regularFields };
   }
 }
