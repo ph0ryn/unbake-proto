@@ -1,5 +1,5 @@
 import type { EnumType } from "./enum.js";
-import type { FieldDescriptor } from "./field.js";
+import type { FieldDescriptor, TypeScope } from "./field.js";
 import type { MessageType } from "./message.js";
 import type { Descriptor } from "./protobuf.js";
 import type { ServiceDescriptor } from "./service.js";
@@ -7,12 +7,14 @@ import type { ServiceDescriptor } from "./service.js";
 export class Formatter {
   private buffer: string[] = [];
   private indentLevel = 0;
+  private messagePath: string[] = [];
 
   constructor(private descriptor: Descriptor) {}
 
   format(): string {
     this.buffer = [];
     this.indentLevel = 0;
+    this.messagePath = [];
 
     if (this.descriptor.syntax) {
       this.line(`syntax = "${this.descriptor.syntax}";`);
@@ -75,6 +77,11 @@ export class Formatter {
     this.line(`message ${msg.name} {`);
     this.indent();
 
+    // Track message path for scope resolution
+    if (msg.name) {
+      this.messagePath.push(msg.name);
+    }
+
     // Nested Enums
     for (const enumType of msg.enumType) {
       this.printEnum(enumType);
@@ -134,6 +141,11 @@ export class Formatter {
       }
     }
 
+    // Pop message path when leaving this message
+    if (msg.name) {
+      this.messagePath.pop();
+    }
+
     this.dedent();
     this.line(`}`);
   }
@@ -178,9 +190,17 @@ export class Formatter {
 
   private printField(field: FieldDescriptor) {
     const syntax = this.descriptor.syntax ?? "proto3";
-    const style = field.getStyle(syntax);
+    const scope = this.getCurrentScope();
+    const style = field.getStyle(syntax, scope);
 
     this.line(`${style.prefix}${style.typeString} ${field.name} = ${field.number};`);
+  }
+
+  private getCurrentScope(): TypeScope {
+    return {
+      messagePath: [...this.messagePath],
+      package: this.descriptor.package ?? "",
+    };
   }
 
   private indent() {
