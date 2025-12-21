@@ -1,0 +1,31 @@
+{
+  "name": "unbake-proto",
+  "module": "src/index.ts",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "lint": "bunx oxlint --type-aware",
+    "format": "bunx oxlint --type-aware --fix . ; bunx oxfmt . ; bunx eslint --fix .",
+    "check": "bunx tsc --noEmit",
+    "precommit": "bun run check && bun run format",
+    "unbake": "bun run src/index.ts",
+    "test": "protoc --descriptor_set_out=test/schema.pb --include_imports test/schema.proto && bun run unbake test/schema.pb"
+  },
+  "devDependencies": {
+    "@stylistic/eslint-plugin": "^5.6.1",
+    "@types/bun": "latest",
+    "eslint": "^9.39.1",
+    "eslint-plugin-import-x": "^4.16.1",
+    "eslint-plugin-oxlint": "^1.32.0",
+    "oxfmt": "^0.16.0",
+    "oxlint": "^1.32.0",
+    "oxlint-tsgolint": "^0.9.1",
+    "typescript-eslint": "^8.49.0"
+  },
+  "peerDependencies": {
+    "typescript": "^5"
+  },
+  "dependencies": {
+    "@bufbuild/protobuf": "^2.10.2"
+  }
+}

@@ -1,0 +1,93 @@
+syntax = "proto3";
+
+package playground.v2;
+
+option go_package = "playground/gen/go;playgroundpb";
+
+// top-level enum
+enum Environment {
+  ENVIRONMENT_UNSPECIFIED = 0;
+  DEV = 1;
+  STAGING = 2;
+  PROD = 3;
+}
+
+message Envelope {
+  string request_id = 1;
+  Environment env = 2;
+
+  // nested enum
+  enum Source {
+    SOURCE_UNSPECIFIED = 0;
+    WEB = 1;
+    MOBILE = 2;
+    API = 3;
+  }
+  Source source = 3;
+
+  // nested message + enum
+  message Actor {
+    enum Kind {
+      KIND_UNSPECIFIED = 0;
+      USER = 1;
+      SERVICE = 2;
+      SYSTEM = 3;
+    }
+    Kind kind = 1;
+    string id = 2;
+  }
+  Actor actor = 4;
+
+  // oneof with enum inside
+  oneof payload {
+    Event event = 10;
+    Command command = 11;
+  }
+
+  message Event {
+    enum Type {
+      TYPE_UNSPECIFIED = 0;
+      CREATED = 1;
+      UPDATED = 2;
+      DELETED = 3;
+    }
+    Type type = 1;
+
+    // enum used inside nested message
+    message Detail {
+      enum Severity {
+        SEVERITY_UNSPECIFIED = 0;
+        LOW = 1;
+        MEDIUM = 2;
+        HIGH = 3;
+      }
+      Severity severity = 1;
+      string description = 2;
+    }
+
+    Detail detail = 2;
+  }
+
+  message Command {
+    enum Action {
+      ACTION_UNSPECIFIED = 0;
+      START = 1;
+      STOP = 2;
+      RESTART = 3;
+    }
+    Action action = 1;
+
+    // enum inside oneof
+    oneof target {
+      TargetType target_type = 10;
+      string target_id = 11;
+    }
+
+    enum TargetType {
+      TARGET_TYPE_UNSPECIFIED = 0;
+      SERVICE = 1;
+      JOB = 2;
+      WORKER = 3;
+    }
+  }
+}
