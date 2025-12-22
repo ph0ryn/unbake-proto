@@ -128,7 +128,7 @@ export class Formatter {
 
     // Print regular fields (with map conversion)
     for (const field of regularFields) {
-      this.printField(field, mapEntryNames, msg.nestedType);
+      this.printField(field, { mapEntryNames, nestedTypes: msg.nestedType });
     }
 
     // Print oneofs
@@ -137,7 +137,8 @@ export class Formatter {
       this.indent();
 
       for (const fld of group.fields) {
-        this.printField(fld);
+        // oneof fields don't have labels (optional/required/repeated)
+        this.printField(fld, { isOneofField: true });
       }
 
       this.dedent();
@@ -254,9 +255,9 @@ export class Formatter {
 
   private printField(
     field: FieldDescriptor,
-    mapEntryNames?: Set<string>,
-    nestedTypes?: MessageType[],
+    opts: { mapEntryNames?: Set<string>; nestedTypes?: MessageType[]; isOneofField?: boolean } = {},
   ) {
+    const { mapEntryNames, nestedTypes, isOneofField } = opts;
     const syntax = this.descriptor.syntax ?? "proto3";
     const scope = this.getCurrentScope();
 
@@ -288,30 +289,38 @@ export class Formatter {
 
     const style = field.getStyle(syntax, scope);
     const options = this.formatFieldOptions(field, syntax);
+    // oneof fields don't have labels (optional/required/repeated)
+    let prefix = style.prefix;
 
-    this.line(`${style.prefix}${style.typeString} ${field.name} = ${field.number}${options};`);
+    if (isOneofField) {
+      prefix = "";
+    }
+
+    this.line(`${prefix}${style.typeString} ${field.name} = ${field.number}${options};`);
   }
 
   private formatFieldOptions(field: FieldDescriptor, syntax: string): string {
     const opts: string[] = [];
 
-    // default_value (proto2 only)
-    if (syntax !== "proto3" && field.defaultValue !== undefined) {
+    // default_value (proto2 only, skip empty strings and undefined)
+    if (syntax !== "proto3" && field.defaultValue !== undefined && field.defaultValue !== "") {
       // String values need quotes
       if (field.type === 9) {
         // TYPE_STRING
         opts.push(`default = "${field.defaultValue}"`);
       } else if (field.type === 12) {
-        // TYPE_BYTES
-        opts.push(`default = "${field.defaultValue}"`);
+        // TYPE_BYTES - skip if empty
+        if (field.defaultValue.length > 0) {
+          opts.push(`default = "${field.defaultValue}"`);
+        }
       } else {
         opts.push(`default = ${field.defaultValue}`);
       }
     }
 
-    // packed option
-    if (field.options?.packed !== undefined) {
-      opts.push(`packed = ${field.options.packed}`);
+    // packed option (only output if true, false is default for proto2)
+    if (field.options?.packed === true) {
+      opts.push("packed = true");
     }
 
     // deprecated option
