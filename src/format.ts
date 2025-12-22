@@ -212,8 +212,46 @@ export class Formatter {
     const syntax = this.descriptor.syntax ?? "proto3";
     const scope = this.getCurrentScope();
     const style = field.getStyle(syntax, scope);
+    const options = this.formatFieldOptions(field, syntax);
 
-    this.line(`${style.prefix}${style.typeString} ${field.name} = ${field.number};`);
+    this.line(`${style.prefix}${style.typeString} ${field.name} = ${field.number}${options};`);
+  }
+
+  private formatFieldOptions(field: FieldDescriptor, syntax: string): string {
+    const opts: string[] = [];
+
+    // default_value (proto2 only)
+    if (syntax !== "proto3" && field.defaultValue !== undefined) {
+      // String values need quotes
+      if (field.type === 9) {
+        // TYPE_STRING
+        opts.push(`default = "${field.defaultValue}"`);
+      } else if (field.type === 12) {
+        // TYPE_BYTES
+        opts.push(`default = "${field.defaultValue}"`);
+      } else {
+        opts.push(`default = ${field.defaultValue}`);
+      }
+    }
+
+    // packed option
+    if (field.options?.packed !== undefined) {
+      opts.push(`packed = ${field.options.packed}`);
+    }
+
+    // deprecated option
+    if (field.options?.deprecated) {
+      opts.push("deprecated = true");
+    }
+
+    // json_name (only if different from default camelCase)
+    // Skip for now as it's complex to determine default
+
+    if (opts.length > 0) {
+      return ` [${opts.join(", ")}]`;
+    }
+
+    return "";
   }
 
   private getCurrentScope(): TypeScope {
