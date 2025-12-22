@@ -9,7 +9,9 @@
     "check": "bunx tsc --noEmit",
     "precommit": "bun run check && bun run format",
     "unbake": "bun run src/index.ts",
-    "test": "protoc --descriptor_set_out=test/schema.pb --include_imports test/schema.proto && bun run unbake test/schema.pb"
+    "test": "protoc --descriptor_set_out=test/schema.pb --include_imports test/schema.proto && bun run unbake test/schema.pb",
+    "test2": "protoc --descriptor_set_out=test/comprehensive_proto2.pb --include_imports test/comprehensive_proto2.proto && bun run unbake test/comprehensive_proto2.pb",
+    "test3": "protoc --descriptor_set_out=test/comprehensive.pb --include_imports test/comprehensive.proto && bun run unbake test/comprehensive.pb"
   },
   "devDependencies": {
     "@stylistic/eslint-plugin": "^5.6.1",

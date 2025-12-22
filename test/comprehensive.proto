@@ -94,23 +94,12 @@ message WithReserved {
   string current_field = 3;
 }
 
-// Message with extension range
-message Extendable {
-  string name = 1;
-  extensions 100 to 199;
-  extensions 1000 to max;
-}
-
-// Extension definition
-extend Extendable {
-  string ext_string = 100;
-  int32 ext_int = 101;
-}
+// Extension ranges and extend are proto2 features
+// See comprehensive_proto2.proto for extension examples
 
 // Message with options
 message WithOptions {
   option deprecated = true;
-  option map_entry = false;
   
   string data = 1;
 }
