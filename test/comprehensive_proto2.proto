@@ -1,0 +1,66 @@
+// Proto2 comprehensive test for unbake-proto validation
+// Contains proto2-specific syntax elements
+
+syntax = "proto2";
+
+package test.proto2;
+
+option java_package = "com.test.proto2";
+
+// Enum with explicit values
+enum Priority {
+  PRIORITY_UNKNOWN = 0;
+  PRIORITY_LOW = 1;
+  PRIORITY_MEDIUM = 2;
+  PRIORITY_HIGH = 3;
+}
+
+// Message with proto2 features
+message Proto2Message {
+  // Required field (proto2 only)
+  required string id = 1;
+  
+  // Optional with default value
+  optional string name = 2 [default = "unnamed"];
+  optional int32 count = 3 [default = 0];
+  optional bool enabled = 4 [default = true];
+  optional Priority priority = 5 [default = PRIORITY_MEDIUM];
+  
+  // Repeated field
+  repeated string tags = 6;
+  
+  // Nested message
+  message Nested {
+    optional string value = 1;
+  }
+  optional Nested nested = 7;
+  
+  // Oneof
+  oneof data {
+    string text_data = 8;
+    bytes binary_data = 9;
+  }
+  
+  // Extension range
+  extensions 100 to 199;
+}
+
+// Extension
+extend Proto2Message {
+  optional string custom_extension = 100;
+}
+
+// Message with reserved
+message Reserved {
+  reserved 1, 2, 5 to 10;
+  reserved "deleted_field";
+  
+  optional string active = 3;
+}
+
+// Group (deprecated but still valid proto2)
+message WithGroup {
+  optional group MyGroup = 1 {
+    optional string value = 2;
+  }
+}

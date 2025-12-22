@@ -1,0 +1,142 @@
+// Comprehensive test proto for unbake-proto validation
+// Contains all syntax elements from descriptor.proto
+
+syntax = "proto3";
+
+package test.comprehensive;
+
+option java_package = "com.test.comprehensive";
+option go_package = "test/comprehensive";
+option java_multiple_files = true;
+option optimize_for = SPEED;
+option deprecated = true;
+
+import "google/protobuf/empty.proto";
+// import public "other.proto";
+// import weak "weak_dep.proto";
+
+// Top-level enum with options
+enum Status {
+  option allow_alias = true;
+  STATUS_UNKNOWN = 0;
+  STATUS_ACTIVE = 1;
+  ACTIVE = 1; // alias
+  STATUS_INACTIVE = 2 [deprecated = true];
+}
+
+// Message with all field types
+message AllTypes {
+  // Scalar types
+  double field_double = 1;
+  float field_float = 2;
+  int64 field_int64 = 3;
+  uint64 field_uint64 = 4;
+  int32 field_int32 = 5;
+  fixed64 field_fixed64 = 6;
+  fixed32 field_fixed32 = 7;
+  bool field_bool = 8;
+  string field_string = 9;
+  bytes field_bytes = 10;
+  uint32 field_uint32 = 11;
+  sfixed32 field_sfixed32 = 12;
+  sfixed64 field_sfixed64 = 13;
+  sint32 field_sint32 = 14;
+  sint64 field_sint64 = 15;
+
+  // Nested message type
+  message Nested {
+    string value = 1;
+    
+    message DeepNested {
+      int32 id = 1;
+    }
+    DeepNested deep = 2;
+  }
+  Nested nested_msg = 16;
+
+  // Nested enum
+  enum InnerStatus {
+    INNER_UNKNOWN = 0;
+    INNER_OK = 1;
+  }
+  InnerStatus inner_status = 17;
+
+  // Repeated fields
+  repeated string repeated_string = 18;
+  repeated int32 repeated_int32 = 19 [packed = true];
+  repeated Nested repeated_nested = 20;
+
+  // Map fields
+  map<string, int32> map_string_int = 21;
+  map<int32, Nested> map_int_msg = 22;
+
+  // Oneof
+  oneof test_oneof {
+    string oneof_string = 23;
+    int32 oneof_int = 24;
+    Nested oneof_nested = 25;
+  }
+
+  // Optional (proto3 explicit)
+  optional string optional_string = 26;
+  optional int32 optional_int = 27;
+
+  // Field options
+  string deprecated_field = 28 [deprecated = true];
+  string json_named = 29 [json_name = "customJsonName"];
+}
+
+// Message with reserved
+message WithReserved {
+  reserved 1, 2, 10 to 15;
+  reserved "old_field", "removed_field";
+  
+  string current_field = 3;
+}
+
+// Message with extension range
+message Extendable {
+  string name = 1;
+  extensions 100 to 199;
+  extensions 1000 to max;
+}
+
+// Extension definition
+extend Extendable {
+  string ext_string = 100;
+  int32 ext_int = 101;
+}
+
+// Message with options
+message WithOptions {
+  option deprecated = true;
+  option map_entry = false;
+  
+  string data = 1;
+}
+
+// Service with all RPC patterns
+service TestService {
+  option deprecated = true;
+  
+  // Unary RPC
+  rpc UnaryCall (AllTypes) returns (AllTypes);
+  
+  // Server streaming
+  rpc ServerStream (AllTypes) returns (stream AllTypes);
+  
+  // Client streaming
+  rpc ClientStream (stream AllTypes) returns (AllTypes);
+  
+  // Bidirectional streaming
+  rpc BidiStream (stream AllTypes) returns (stream AllTypes);
+  
+  // With empty types
+  rpc EmptyCall (google.protobuf.Empty) returns (google.protobuf.Empty);
+}
+
+// Proto2 style message (for reference, would need separate proto2 file)
+// message Proto2Style {
+//   required string required_field = 1;
+//   optional string optional_field = 2 [default = "default_value"];
+// }
