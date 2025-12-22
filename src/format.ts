@@ -71,7 +71,7 @@ export class Formatter {
 
     // Top-level Extensions
     for (const ext of this.descriptor.extension) {
-      this.line(`extend ${ext.extendee} {`);
+      this.line(`extend ${ext.getExtendee(this.getCurrentScope())} {`);
       this.indent();
       this.printField(ext);
       this.dedent();
@@ -150,7 +150,7 @@ export class Formatter {
       this.emptyLine();
 
       for (const extension of msg.extension) {
-        this.line(`extend ${extension.extendee} {`);
+        this.line(`extend ${extension.getExtendee(this.getCurrentScope())} {`);
         this.indent();
         this.printField(extension);
         this.dedent();

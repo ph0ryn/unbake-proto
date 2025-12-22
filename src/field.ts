@@ -56,6 +56,17 @@ export class FieldDescriptor {
     };
   }
 
+  /**
+   * Returns the shortened extendee name for extension fields.
+   */
+  getExtendee(scope: TypeScope): string {
+    if (!this.extendee) {
+      return "";
+    }
+
+    return shortenTypeName(this.extendee, scope);
+  }
+
   private resolvePrefix(syntax: string): string {
     // Handle proto3 optional keyword
     if (syntax === "proto3" && this.label === 1 && this.proto3Optional) {
