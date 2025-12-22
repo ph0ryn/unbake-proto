@@ -3,10 +3,10 @@ import { readFileSync } from "fs";
 import { fromBinary } from "@bufbuild/protobuf";
 import { FileDescriptorSetSchema } from "@bufbuild/protobuf/wkt";
 
-import { Formatter as Formatter2 } from "./proto2/format.js";
-import { Descriptor as Descriptor2 } from "./proto2/protobuf.js";
-import { Formatter as Formatter3 } from "./proto3/format.js";
-import { Descriptor as Descriptor3 } from "./proto3/protobuf.js";
+import { Formatter as Formatter2 } from "./proto2/format";
+import { Descriptor as Descriptor2 } from "./proto2/protobuf";
+import { Formatter as Formatter3 } from "./proto3/format";
+import { Descriptor as Descriptor3 } from "./proto3/protobuf";
 
 const inputPath = process.argv[2];
 

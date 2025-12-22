@@ -1,7 +1,7 @@
-import { EnumType } from "./enum.js";
-import { FieldDescriptor } from "./field.js";
-import { MessageType } from "./message.js";
-import { ServiceDescriptor } from "./service.js";
+import { EnumType } from "./enum";
+import { FieldDescriptor } from "./field";
+import { MessageType } from "./message";
+import { ServiceDescriptor } from "./service";
 
 import type { FileDescriptorProto } from "@bufbuild/protobuf/wkt";
 

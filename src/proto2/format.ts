@@ -1,8 +1,8 @@
-import type { EnumType } from "./enum.js";
-import type { FieldDescriptor, TypeScope } from "./field.js";
-import type { MessageType } from "./message.js";
-import type { Descriptor } from "./protobuf.js";
-import type { ServiceDescriptor } from "./service.js";
+import type { EnumType } from "./enum";
+import type { FieldDescriptor, TypeScope } from "./field";
+import type { MessageType } from "./message";
+import type { Descriptor } from "./protobuf";
+import type { ServiceDescriptor } from "./service";
 
 export class Formatter {
   private buffer: string[] = [];

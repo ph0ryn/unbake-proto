@@ -1,4 +1,4 @@
-import { shortenTypeName, type TypeScope } from "./scope.js";
+import { shortenTypeName, type TypeScope } from "./scope";
 
 import type { MethodDescriptorProto, ServiceDescriptorProto } from "@bufbuild/protobuf/wkt";
 

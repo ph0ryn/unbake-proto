@@ -1,6 +1,6 @@
-import { EnumType } from "./enum.js";
-import { FieldDescriptor } from "./field.js";
-import { OneofDescriptor } from "./oneof.js";
+import { EnumType } from "./enum";
+import { FieldDescriptor } from "./field";
+import { OneofDescriptor } from "./oneof";
 
 import type { DescriptorProto } from "@bufbuild/protobuf/wkt";
 
