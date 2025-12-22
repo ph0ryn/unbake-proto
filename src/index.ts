@@ -17,28 +17,19 @@ if (!inputPath) {
 
 const buffer = readFileSync(inputPath);
 
-try {
-  // Try parsing as FileDescriptorSet first
-  const fds = fromBinary(FileDescriptorSetSchema, buffer);
+const fds = fromBinary(FileDescriptorSetSchema, buffer);
 
-  for (const file of fds.file) {
-    // Empty syntax or "proto2" means proto2 (proto2 is default when syntax is not specified)
-    if (file.syntax === "proto3") {
-      const descriptor = new Descriptor3(file);
-      const formatter = new Formatter3(descriptor);
+for (const file of fds.file) {
+  // Empty syntax or "proto2" means proto2 (proto2 is default when syntax is not specified)
+  if (file.syntax === "proto3") {
+    const descriptor = new Descriptor3(file);
+    const formatter = new Formatter3(descriptor);
 
-      console.log(formatter.format());
-    } else {
-      const descriptor = new Descriptor2(file);
-      const formatter = new Formatter2(descriptor);
+    console.log(formatter.format());
+  } else {
+    const descriptor = new Descriptor2(file);
+    const formatter = new Formatter2(descriptor);
 
-      console.log(formatter.format());
-    }
+    console.log(formatter.format());
   }
-} catch (err) {
-  // Fallback: try parsing as single FileDescriptorProto?
-  // Usually input is a Set, but robust handling is good.
-  // Or maybe just fail.
-  console.error("Failed to parse FileDescriptorSet:", err);
-  process.exit(1);
 }
