@@ -141,6 +141,26 @@ export class Formatter {
       }
     }
 
+    // Reserved ranges
+    if (msg.reservedRange && msg.reservedRange.length > 0) {
+      const ranges = msg.reservedRange.map((range) => {
+        if (range.start === range.end! - 1) {
+          return String(range.start);
+        }
+
+        return `${range.start} to ${range.end! - 1}`;
+      });
+
+      this.line(`reserved ${ranges.join(", ")};`);
+    }
+
+    // Reserved names
+    if (msg.reservedName && msg.reservedName.length > 0) {
+      const names = msg.reservedName.map((name) => `"${name}"`);
+
+      this.line(`reserved ${names.join(", ")};`);
+    }
+
     // Pop message path when leaving this message
     if (msg.name) {
       this.messagePath.pop();
