@@ -100,14 +100,25 @@ export class Formatter {
       this.line("option map_entry = true;");
     }
 
+    // Collect map entry message names for map field detection
+    const mapEntryNames = new Set<string>();
+
+    for (const nested of msg.nestedType) {
+      if (nested.options?.mapEntry) {
+        mapEntryNames.add(nested.name ?? "");
+      }
+    }
+
     // Nested Enums
     for (const enumType of msg.enumType) {
       this.printEnum(enumType);
       this.emptyLine();
     }
 
-    // Nested Messages
-    for (const nested of msg.nestedType) {
+    // Nested Messages (skip map_entry messages)
+    const nonMapNestedTypes = msg.nestedType.filter((nested) => !nested.options?.mapEntry);
+
+    for (const nested of nonMapNestedTypes) {
       this.printMessage(nested);
       this.emptyLine();
     }
@@ -115,9 +126,9 @@ export class Formatter {
     // Use domain method to get field groups
     const { oneofGroups, regularFields } = msg.getFieldGroups();
 
-    // Print regular fields
+    // Print regular fields (with map conversion)
     for (const field of regularFields) {
-      this.printField(field);
+      this.printField(field, mapEntryNames, msg.nestedType);
     }
 
     // Print oneofs
@@ -241,9 +252,40 @@ export class Formatter {
     this.line(`}`);
   }
 
-  private printField(field: FieldDescriptor) {
+  private printField(
+    field: FieldDescriptor,
+    mapEntryNames?: Set<string>,
+    nestedTypes?: MessageType[],
+  ) {
     const syntax = this.descriptor.syntax ?? "proto3";
     const scope = this.getCurrentScope();
+
+    // Check if this field is a map field
+    if (mapEntryNames && nestedTypes && field.typeName) {
+      const shortTypeName = field.typeName.split(".").pop() ?? "";
+
+      if (mapEntryNames.has(shortTypeName)) {
+        const mapEntry = nestedTypes.find((nt) => nt.name === shortTypeName);
+
+        if (mapEntry && mapEntry.field.length >= 2) {
+          const keyField = mapEntry.field.find((fld) => fld.number === 1);
+          const valueField = mapEntry.field.find((fld) => fld.number === 2);
+
+          if (keyField && valueField) {
+            const keyStyle = keyField.getStyle(syntax, scope);
+            const valueStyle = valueField.getStyle(syntax, scope);
+            const options = this.formatFieldOptions(field, syntax);
+
+            this.line(
+              `map<${keyStyle.typeString}, ${valueStyle.typeString}> ${field.name} = ${field.number}${options};`,
+            );
+
+            return;
+          }
+        }
+      }
+    }
+
     const style = field.getStyle(syntax, scope);
     const options = this.formatFieldOptions(field, syntax);
 
