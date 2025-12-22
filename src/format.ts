@@ -33,9 +33,18 @@ export class Formatter {
     // File options
     this.printFileOptions();
 
-    // Imports
-    for (const dep of this.descriptor.dependency) {
-      this.line(`import "${dep}";`);
+    // Imports (with public/weak modifiers)
+    for (let idx = 0; idx < this.descriptor.dependency.length; idx++) {
+      const dep = this.descriptor.dependency[idx];
+      let modifier = "";
+
+      if (this.descriptor.publicDependency.includes(idx)) {
+        modifier = "public ";
+      } else if (this.descriptor.weakDependency.includes(idx)) {
+        modifier = "weak ";
+      }
+
+      this.line(`import ${modifier}"${dep}";`);
     }
 
     if (this.descriptor.dependency.length > 0) {
