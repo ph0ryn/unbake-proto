@@ -5,7 +5,7 @@ import type { FieldDescriptorProto } from "@bufbuild/protobuf/wkt";
 export type { TypeScope };
 
 export interface FieldStyle {
-  prefix: string; // "optional ", "required ", "repeated ", ""
+  prefix: string; // "", "optional ", "repeated "
   typeString: string; // Resolved type name
 }
 
@@ -46,12 +46,12 @@ export class FieldDescriptor {
   }
 
   /**
-   * Returns the style information (prefix and type string) for this field
-   * based on the proto syntax version and current scope.
+   * Returns the style information (prefix and type string) for this field.
+   * Proto3 version - optional is implicit unless proto3_optional is set.
    */
-  getStyle(syntax: string, scope: TypeScope): FieldStyle {
+  getStyle(scope: TypeScope): FieldStyle {
     return {
-      prefix: this.resolvePrefix(syntax),
+      prefix: this.resolvePrefix(),
       typeString: this.resolveTypeString(scope),
     };
   }
@@ -67,23 +67,22 @@ export class FieldDescriptor {
     return shortenTypeName(this.extendee, scope);
   }
 
-  private resolvePrefix(syntax: string): string {
+  private resolvePrefix(): string {
     // Handle proto3 optional keyword
-    if (syntax === "proto3" && this.label === 1 && this.proto3Optional) {
+    if (this.label === 1 && this.proto3Optional) {
       return "optional ";
     }
 
     // In proto3, OPTIONAL label is implicit (empty prefix)
-    if (syntax === "proto3" && this.label === 1) {
+    if (this.label === 1) {
       return "";
     }
 
     // Label mapping: 1=OPTIONAL, 2=REQUIRED, 3=REPEATED
     switch (this.label) {
-      case 1:
-        return "optional ";
       case 2:
-        return "required ";
+        // Required is not valid in proto3, but handle for safety
+        throw new Error(`Unexpected required label in proto3: field "${this.name}"`);
       case 3:
         return "repeated ";
       default:

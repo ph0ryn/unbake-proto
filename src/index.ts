@@ -3,8 +3,10 @@ import { readFileSync } from "fs";
 import { fromBinary } from "@bufbuild/protobuf";
 import { FileDescriptorSetSchema } from "@bufbuild/protobuf/wkt";
 
-import { Formatter } from "./format.js";
-import { Descriptor } from "./protobuf.js";
+import { Formatter as Formatter2 } from "./proto2/format.js";
+import { Descriptor as Descriptor2 } from "./proto2/protobuf.js";
+import { Formatter as Formatter3 } from "./proto3/format.js";
+import { Descriptor as Descriptor3 } from "./proto3/protobuf.js";
 
 const inputPath = process.argv[2];
 
@@ -20,10 +22,18 @@ try {
   const fds = fromBinary(FileDescriptorSetSchema, buffer);
 
   for (const file of fds.file) {
-    const descriptor = new Descriptor(file);
-    const formatter = new Formatter(descriptor);
+    // Empty syntax or "proto2" means proto2 (proto2 is default when syntax is not specified)
+    if (file.syntax === "proto3") {
+      const descriptor = new Descriptor3(file);
+      const formatter = new Formatter3(descriptor);
 
-    console.log(formatter.format());
+      console.log(formatter.format());
+    } else {
+      const descriptor = new Descriptor2(file);
+      const formatter = new Formatter2(descriptor);
+
+      console.log(formatter.format());
+    }
   }
 } catch (err) {
   // Fallback: try parsing as single FileDescriptorProto?

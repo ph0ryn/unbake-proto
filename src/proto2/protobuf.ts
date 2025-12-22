@@ -20,7 +20,6 @@ export class Descriptor {
 
   options?: any; // FileOptions
   sourceCodeInfo?: any; // SourceCodeInfo
-  syntax?: string;
   edition?: string;
 
   constructor(proto: FileDescriptorProto) {
@@ -29,7 +28,6 @@ export class Descriptor {
     this.dependency = proto.dependency;
     this.publicDependency = proto.publicDependency;
     this.weakDependency = proto.weakDependency;
-    // this.optionDependency = proto.optionDependency; // @bufbuild types might miss this if not latest, check mapping
 
     this.messageType = proto.messageType.map((msg) => new MessageType(msg));
     this.enumType = proto.enumType.map((enu) => new EnumType(enu));
@@ -39,11 +37,9 @@ export class Descriptor {
 
     this.options = proto.options;
     this.sourceCodeInfo = proto.sourceCodeInfo;
-    this.syntax = proto.syntax;
     this.edition = proto.edition as any;
 
     // Manual handling for fields that might be missing in standard types but present in raw proto
-    // For now assuming @bufbuild/protobuf/wkt FileDescriptorProto is sufficient or we cast to any
     this.optionDependency = (proto as any).optionDependency ?? [];
   }
 

@@ -16,10 +16,9 @@ export class Formatter {
     this.indentLevel = 0;
     this.messagePath = [];
 
-    if (this.descriptor.syntax) {
-      this.line(`syntax = "${this.descriptor.syntax}";`);
-      this.emptyLine();
-    }
+    // Proto2 syntax declaration
+    this.line(`syntax = "proto2";`);
+    this.emptyLine();
 
     if (this.descriptor.edition) {
       this.line(`// edition = ${this.descriptor.edition};`);
@@ -258,7 +257,6 @@ export class Formatter {
     opts: { mapEntryNames?: Set<string>; nestedTypes?: MessageType[]; isOneofField?: boolean } = {},
   ) {
     const { mapEntryNames, nestedTypes, isOneofField } = opts;
-    const syntax = this.descriptor.syntax ?? "proto3";
     const scope = this.getCurrentScope();
 
     // Check if this field is a map field
@@ -273,9 +271,9 @@ export class Formatter {
           const valueField = mapEntry.field.find((fld) => fld.number === 2);
 
           if (keyField && valueField) {
-            const keyStyle = keyField.getStyle(syntax, scope);
-            const valueStyle = valueField.getStyle(syntax, scope);
-            const options = this.formatFieldOptions(field, syntax);
+            const keyStyle = keyField.getStyle(scope);
+            const valueStyle = valueField.getStyle(scope);
+            const options = this.formatFieldOptions(field);
 
             this.line(
               `map<${keyStyle.typeString}, ${valueStyle.typeString}> ${field.name} = ${field.number}${options};`,
@@ -287,23 +285,23 @@ export class Formatter {
       }
     }
 
-    const style = field.getStyle(syntax, scope);
-    const options = this.formatFieldOptions(field, syntax);
+    const { prefix: stylePrefix, typeString } = field.getStyle(scope);
+    const options = this.formatFieldOptions(field);
     // oneof fields don't have labels (optional/required/repeated)
-    let prefix = style.prefix;
+    let prefix = stylePrefix;
 
     if (isOneofField) {
       prefix = "";
     }
 
-    this.line(`${prefix}${style.typeString} ${field.name} = ${field.number}${options};`);
+    this.line(`${prefix}${typeString} ${field.name} = ${field.number}${options};`);
   }
 
-  private formatFieldOptions(field: FieldDescriptor, syntax: string): string {
+  private formatFieldOptions(field: FieldDescriptor): string {
     const opts: string[] = [];
 
-    // default_value (proto2 only, skip empty strings and undefined)
-    if (syntax !== "proto3" && field.defaultValue !== undefined && field.defaultValue !== "") {
+    // default_value (proto2 specific)
+    if (field.defaultValue !== undefined && field.defaultValue !== "") {
       // String values need quotes
       if (field.type === 9) {
         // TYPE_STRING
@@ -327,9 +325,6 @@ export class Formatter {
     if (field.options?.deprecated) {
       opts.push("deprecated = true");
     }
-
-    // json_name (only if different from default camelCase)
-    // Skip for now as it's complex to determine default
 
     if (opts.length > 0) {
       return ` [${opts.join(", ")}]`;
