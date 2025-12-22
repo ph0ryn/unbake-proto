@@ -30,15 +30,30 @@ git commit -m "message"
 ## structure
 
 ```shell
-src/
+src
 ├── index.ts
-├── protobuf.ts # protobuf instance
-├── header.ts # header data
-├── option.ts # option
-├── message.ts # messageType
-├── enum.ts # enumType
-├── format.ts # format processed data into .proto
-└── can add more files as needed
+├── proto2
+│   ├── enum.ts
+│   ├── field.ts
+│   ├── format.ts
+│   ├── header.ts
+│   ├── message.ts
+│   ├── oneof.ts
+│   ├── option.ts
+│   ├── protobuf.ts
+│   ├── scope.ts
+│   └── service.ts
+└── proto3
+    ├── enum.ts
+    ├── field.ts
+    ├── format.ts
+    ├── header.ts
+    ├── message.ts
+    ├── oneof.ts
+    ├── option.ts
+    ├── protobuf.ts
+    ├── scope.ts
+    └── service.ts
 ```
 
 ## workflow
