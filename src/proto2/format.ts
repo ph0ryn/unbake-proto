@@ -298,39 +298,23 @@ export class Formatter {
   }
 
   private formatFieldOptions(field: FieldDescriptor): string {
-    const opts: string[] = [];
+    const entries = field.getOptions();
 
-    // default_value (proto2 specific)
-    if (field.defaultValue !== undefined && field.defaultValue !== "") {
-      // String values need quotes
-      if (field.type === 9) {
-        // TYPE_STRING
-        opts.push(`default = "${field.defaultValue}"`);
-      } else if (field.type === 12) {
-        // TYPE_BYTES - skip if empty
-        if (field.defaultValue.length > 0) {
-          opts.push(`default = "${field.defaultValue}"`);
-        }
-      } else {
-        opts.push(`default = ${field.defaultValue}`);
-      }
+    if (entries.length === 0) {
+      return "";
     }
 
-    // packed option (only output if true, false is default for proto2)
-    if (field.options?.packed === true) {
-      opts.push("packed = true");
+    const opts = entries.map((entry) => `${entry.name} = ${entry.value}`);
+
+    // Single option: inline format
+    if (opts.length === 1) {
+      return ` [${opts[0]}]`;
     }
 
-    // deprecated option
-    if (field.options?.deprecated) {
-      opts.push("deprecated = true");
-    }
+    // Multiple options: multi-line format with indentation
+    const indent = "  ".repeat(this.indentLevel + 1);
 
-    if (opts.length > 0) {
-      return ` [${opts.join(", ")}]`;
-    }
-
-    return "";
+    return ` [\n${indent}${opts.join(`,\n${indent}`)}\n${"  ".repeat(this.indentLevel)}]`;
   }
 
   private getCurrentScope(): TypeScope {

@@ -298,27 +298,23 @@ export class Formatter {
   }
 
   private formatFieldOptions(field: FieldDescriptor): string {
-    const opts: string[] = [];
+    const entries = field.getOptions();
 
-    // Proto3 does not support default values in .proto files
-
-    // packed option (implicit true for proto3, but can be explicitly false)
-    // Note: In proto3, repeated scalar fields are packed by default
-    // We only output if explicitly set to true (for documentation) or if it's false
-    if (field.options?.packed === true) {
-      opts.push("packed = true");
+    if (entries.length === 0) {
+      return "";
     }
 
-    // deprecated option
-    if (field.options?.deprecated) {
-      opts.push("deprecated = true");
+    const opts = entries.map((entry) => `${entry.name} = ${entry.value}`);
+
+    // Single option: inline format
+    if (opts.length === 1) {
+      return ` [${opts[0]}]`;
     }
 
-    if (opts.length > 0) {
-      return ` [${opts.join(", ")}]`;
-    }
+    // Multiple options: multi-line format with indentation
+    const indent = "  ".repeat(this.indentLevel + 1);
 
-    return "";
+    return ` [\n${indent}${opts.join(`,\n${indent}`)}\n${"  ".repeat(this.indentLevel)}]`;
   }
 
   private getCurrentScope(): TypeScope {
