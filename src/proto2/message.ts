@@ -36,8 +36,8 @@ export class MessageType {
     this.extensionRange = proto.extensionRange;
     this.oneofDecl = proto.oneofDecl.map((onf) => new OneofDescriptor(onf));
     this.options = proto.options;
-    this.reservedRange = proto.reservedRange;
-    this.reservedName = proto.reservedName;
+    this.reservedRange = proto.reservedRange ?? [];
+    this.reservedName = proto.reservedName ?? [];
   }
 
   /**

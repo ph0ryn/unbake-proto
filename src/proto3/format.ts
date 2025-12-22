@@ -4,6 +4,8 @@ import type { MessageType } from "./message";
 import type { Descriptor } from "./protobuf";
 import type { ServiceDescriptor } from "./service";
 
+export const OUT_DEFAULT = false;
+
 export class Formatter {
   private buffer: string[] = [];
   private indentLevel = 0;
@@ -173,7 +175,7 @@ export class Formatter {
     // Reserved ranges
     if (msg.reservedRange && msg.reservedRange.length > 0) {
       const ranges = msg.reservedRange.map((range) => {
-        if (range.start === range.end! - 1) {
+        if (range.start === range.end) {
           return String(range.start);
         }
 
@@ -348,7 +350,9 @@ export class Formatter {
     const options = this.descriptor.getFileOptions();
 
     for (const opt of options) {
-      this.line(`option ${opt.name} = ${opt.value};`);
+      if (OUT_DEFAULT || !opt.isDefault) {
+        this.line(`option ${opt.name} = ${opt.value};`);
+      }
     }
 
     if (options.length > 0) {

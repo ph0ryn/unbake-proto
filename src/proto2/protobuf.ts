@@ -71,8 +71,10 @@ export class Descriptor {
     for (const { key, name } of stringOptions) {
       const value = opts[key];
 
-      if (typeof value === "string" && value.length > 0) {
-        result.push({ name, value: `"${value}"` });
+      if (typeof value === "string") {
+        const isDefault = value.length === 0;
+
+        result.push({ isDefault, name, value: `"${value}"` });
       }
     }
 
@@ -90,13 +92,15 @@ export class Descriptor {
     for (const { defaultValue, key, name } of boolOptions) {
       const value = opts[key];
 
-      if (typeof value === "boolean" && value !== defaultValue) {
-        result.push({ name, value: String(value) });
+      if (typeof value === "boolean") {
+        const isDefault = value === defaultValue;
+
+        result.push({ isDefault, name, value: String(value) });
       }
     }
 
     // optimize_for enum (default: SPEED = 1)
-    if (opts.optimizeFor !== undefined && opts.optimizeFor !== 1) {
+    if (opts.optimizeFor !== undefined) {
       const optimizeMap: Record<number, string> = {
         1: "SPEED",
         2: "CODE_SIZE",
@@ -105,7 +109,7 @@ export class Descriptor {
       const enumVal = optimizeMap[opts.optimizeFor];
 
       if (enumVal) {
-        result.push({ name: "optimize_for", value: enumVal });
+        result.push({ isDefault: opts.optimizeFor === 1, name: "optimize_for", value: enumVal });
       }
     }
 
@@ -116,4 +120,5 @@ export class Descriptor {
 export interface FileOption {
   name: string;
   value: string;
+  isDefault: boolean;
 }

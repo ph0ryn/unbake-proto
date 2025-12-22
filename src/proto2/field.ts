@@ -1,3 +1,4 @@
+import { OUT_DEFAULT } from "./format";
 import { shortenTypeName, type TypeScope } from "./scope";
 
 import type { FieldDescriptorProto } from "@bufbuild/protobuf/wkt";
@@ -79,17 +80,37 @@ export class FieldDescriptor {
     const entries: FieldOptionEntry[] = [];
 
     // default_value (proto2 specific)
-    if (this.defaultValue !== undefined && this.defaultValue !== "") {
-      if (this.type === 9) {
-        // TYPE_STRING
-        entries.push({ name: "default", value: `"${this.defaultValue}"` });
-      } else if (this.type === 12) {
-        // TYPE_BYTES
-        if (this.defaultValue.length > 0) {
+    if (this.defaultValue !== undefined && (OUT_DEFAULT || this.defaultValue !== "")) {
+      // Only output default if it's a scalar type or enum
+      const isScalarOrEnum =
+        this.type !== undefined &&
+        this.type !== 11 && // MESSAGE
+        this.type !== 10 && // GROUP
+        this.label !== 3; // REPEATED
+
+      if (isScalarOrEnum) {
+        if (this.type === 9) {
+          // TYPE_STRING
           entries.push({ name: "default", value: `"${this.defaultValue}"` });
+        } else if (this.type === 12) {
+          // TYPE_BYTES
+          if (this.defaultValue.length > 0 || OUT_DEFAULT) {
+            entries.push({ name: "default", value: `"${this.defaultValue}"` });
+          }
+        } else {
+          // numeric, bool, or enum
+          if (this.defaultValue !== "" || OUT_DEFAULT) {
+            let val = this.defaultValue;
+
+            if (val === "") {
+              val = this.getDefaultValueForType();
+            }
+
+            if (val !== "") {
+              entries.push({ name: "default", value: val });
+            }
+          }
         }
-      } else {
-        entries.push({ name: "default", value: this.defaultValue });
       }
     }
 
@@ -281,6 +302,30 @@ export class FieldDescriptor {
         return "sint64";
       default:
         throw new Error(`Unexpected field type: ${this.type}`);
+    }
+  }
+
+  private getDefaultValueForType(): string {
+    switch (this.type) {
+      case 1: // DOUBLE
+      case 2: // FLOAT
+      case 3: // INT64
+      case 4: // UINT64
+      case 5: // INT32
+      case 6: // FIXED64
+      case 7: // FIXED32
+      case 13: // UINT32
+      case 15: // SFIXED32
+      case 16: // SFIXED64
+      case 17: // SINT32
+      case 18: // SINT64
+        return "0";
+      case 8: // BOOL
+        return "false";
+      case 14: // ENUM
+        return "";
+      default:
+        return "";
     }
   }
 }
