@@ -91,6 +91,15 @@ export class Formatter {
       this.messagePath.push(msg.name);
     }
 
+    // Message options
+    if (msg.options?.deprecated) {
+      this.line("option deprecated = true;");
+    }
+
+    if (msg.options?.mapEntry) {
+      this.line("option map_entry = true;");
+    }
+
     // Nested Enums
     for (const enumType of msg.enumType) {
       this.printEnum(enumType);
@@ -183,8 +192,23 @@ export class Formatter {
     this.line(`enum ${enumType.name} {`);
     this.indent();
 
+    // Enum options
+    if (enumType.options?.allowAlias) {
+      this.line("option allow_alias = true;");
+    }
+
+    if (enumType.options?.deprecated) {
+      this.line("option deprecated = true;");
+    }
+
     for (const val of enumType.value) {
-      this.line(`${val.name} = ${val.number};`);
+      let valOpts = "";
+
+      if (val.options?.deprecated) {
+        valOpts = " [deprecated = true]";
+      }
+
+      this.line(`${val.name} = ${val.number}${valOpts};`);
     }
 
     this.dedent();
