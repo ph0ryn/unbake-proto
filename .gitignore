@@ -1,5 +1,7 @@
 node_modules/
 
 dist/
+
+out/
 test/*.pb
 out.proto
