@@ -1,3 +1,5 @@
+import { shortenTypeName, type TypeScope } from "./scope.js";
+
 import type { MethodDescriptorProto, ServiceDescriptorProto } from "@bufbuild/protobuf/wkt";
 
 export class ServiceDescriptor {
@@ -39,7 +41,7 @@ export class MethodDescriptor {
   /**
    * Returns the method signature information for RPC formatting.
    */
-  getSignature(): MethodSignature {
+  getSignature(scope: TypeScope): MethodSignature {
     if (!this.inputType) {
       throw new Error(`Method "${this.name}" has no inputType`);
     }
@@ -50,8 +52,8 @@ export class MethodDescriptor {
 
     return {
       clientStreaming: this.clientStreaming ?? false,
-      inputType: this.inputType,
-      outputType: this.outputType,
+      inputType: shortenTypeName(this.inputType, scope),
+      outputType: shortenTypeName(this.outputType, scope),
       serverStreaming: this.serverStreaming ?? false,
     };
   }

@@ -232,7 +232,7 @@ export class Formatter {
     this.indent();
 
     for (const method of service.method) {
-      const sig = method.getSignature();
+      const sig = method.getSignature(this.getCurrentScope());
       let inputPrefix = "";
       let outputPrefix = "";
 
