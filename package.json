@@ -3,11 +3,17 @@
   "module": "src/index.ts",
   "type": "module",
   "private": true,
+  "bin": "dist/index.js",
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
   "scripts": {
     "lint": "bunx oxlint --type-aware",
     "format": "bunx oxlint --type-aware --fix . ; bunx oxfmt . ; bunx eslint --fix .",
     "check": "bunx tsc --noEmit",
-    "precommit": "bun run check && bun run format",
+    "precommit": "bun run check && bun run format && bun run build",
     "unbake": "bun run src/index.ts",
     "test": "protoc --descriptor_set_out=test/schema.pb --include_imports test/schema.proto && bun run unbake test/schema.pb",
     "test2": "protoc --descriptor_set_out=test/descriptor.pb --include_imports descriptor.proto && bun run unbake test/descriptor.pb",
