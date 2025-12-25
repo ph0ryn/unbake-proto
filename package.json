@@ -1,13 +1,21 @@
 {
   "name": "unbake-proto",
   "module": "src/index.ts",
+  "version": "1.0.2",
+  "author": "ph0ryn",
   "type": "module",
-  "private": true,
-  "bin": "dist/index.js",
+  "license": "MIT",
+  "bin": {
+    "unbake-proto": "dist/index.js"
+  },
   "files": [
     "dist",
     "README.md",
     "LICENSE"
+  ],
+  "keywords": [
+    "protobuf",
+    "protoc"
   ],
   "scripts": {
     "lint": "bunx oxlint --type-aware",
