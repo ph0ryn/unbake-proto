@@ -1,35 +1,46 @@
 {
   "name": "unbake-proto",
-  "module": "src/index.ts",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "author": "ph0ryn",
+  "description": "Decompile baked protobuf descriptors into human-readable working .proto",
   "type": "module",
   "license": "MIT",
   "bin": {
-    "unbake-proto": "dist/index.js"
+    "unbake-proto": "src/index.ts"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ph0ryn/unbake-proto.git"
   },
   "files": [
-    "dist",
-    "README.md",
-    "LICENSE"
+    "dist"
   ],
   "keywords": [
     "protobuf",
     "protoc"
   ],
+  "main": "dist/index.js",
+  "module": "dist/index.js",
+  "publishConfig": {
+    "bin": {
+      "unbake-proto": "dist/index.js"
+    }
+  },
   "scripts": {
     "lint": "bunx oxlint --type-aware",
-    "format": "bunx oxlint --type-aware --fix . ; bunx oxfmt . ; bunx eslint --fix .",
+    "format": "bun run lint --fix . ; bunx oxfmt . ; bunx eslint --fix .",
     "check": "bunx tsc --noEmit",
-    "precommit": "bun run check && bun run format && bun run build",
+    "precommit": "bun run check && bun run format",
+    "prepack": "bun run precommit && clean-pkg-json -r dependencies -r peerDependencies && bun run build",
+    "postpack": "git checkout package.json",
     "unbake": "bun run src/index.ts",
-    "test": "protoc --descriptor_set_out=test/schema.pb --include_imports test/schema.proto && bun run unbake test/schema.pb",
-    "test2": "protoc --descriptor_set_out=test/descriptor.pb --include_imports descriptor.proto && bun run unbake test/descriptor.pb",
-    "test3": "protoc --descriptor_set_out=test/comprehensive.pb --include_imports test/comprehensive.proto && bun run unbake test/comprehensive.pb"
+    "test:proto2": "protoc --descriptor_set_out=test/descriptor.pb --include_imports descriptor.proto && bun run unbake test/descriptor.pb",
+    "test:proto3": "protoc --descriptor_set_out=test/comprehensive.pb --include_imports test/comprehensive.proto && bun run unbake test/comprehensive.pb"
   },
   "devDependencies": {
     "@stylistic/eslint-plugin": "^5.6.1",
     "@types/bun": "latest",
+    "clean-pkg-json": "^1.3.0",
     "eslint": "^9.39.1",
     "eslint-plugin-import-x": "^4.16.1",
     "eslint-plugin-oxlint": "^1.32.0",
