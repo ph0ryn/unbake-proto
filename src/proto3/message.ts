@@ -2,7 +2,11 @@ import { EnumType } from "./enum";
 import { FieldDescriptor } from "./field";
 import { OneofDescriptor } from "./oneof";
 
-import type { DescriptorProto } from "@bufbuild/protobuf/wkt";
+import type {
+  DescriptorProto,
+  ExtensionRangeOptions,
+  MessageOptions,
+} from "@bufbuild/protobuf/wkt";
 
 export interface OneofGroup {
   name: string;
@@ -20,10 +24,10 @@ export class MessageType {
   extension: FieldDescriptor[];
   nestedType: MessageType[];
   enumType: EnumType[];
-  extensionRange: { start?: number; end?: number; options?: any }[];
+  extensionRange: { start?: number; end?: number; options?: ExtensionRangeOptions }[];
   oneofDecl: OneofDescriptor[];
 
-  options?: any; // MessageOptions
+  options?: MessageOptions;
   reservedRange: { start?: number; end?: number }[];
   reservedName: string[];
 

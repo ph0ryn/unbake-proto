@@ -1,8 +1,8 @@
-import type { OneofDescriptorProto } from "@bufbuild/protobuf/wkt";
+import type { OneofDescriptorProto, OneofOptions } from "@bufbuild/protobuf/wkt";
 
 export class OneofDescriptor {
   name?: string;
-  options?: any; // OneofOptions
+  options?: OneofOptions;
 
   constructor(proto: OneofDescriptorProto) {
     this.name = proto.name;

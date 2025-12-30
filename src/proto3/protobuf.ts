@@ -3,7 +3,7 @@ import { FieldDescriptor } from "./field";
 import { MessageType } from "./message";
 import { ServiceDescriptor } from "./service";
 
-import type { FileDescriptorProto } from "@bufbuild/protobuf/wkt";
+import type { FileDescriptorProto, FileOptions, SourceCodeInfo } from "@bufbuild/protobuf/wkt";
 
 export class Descriptor {
   name?: string;
@@ -18,8 +18,8 @@ export class Descriptor {
   service: ServiceDescriptor[];
   extension: FieldDescriptor[];
 
-  options?: any; // FileOptions
-  sourceCodeInfo?: any; // SourceCodeInfo
+  options?: FileOptions;
+  sourceCodeInfo?: SourceCodeInfo;
   edition?: string;
 
   constructor(proto: FileDescriptorProto) {
@@ -69,7 +69,7 @@ export class Descriptor {
     ];
 
     for (const { key, name } of stringOptions) {
-      const value = opts[key];
+      const value = (opts as any)[key];
 
       if (typeof value === "string") {
         const isDefault = value.length === 0;
@@ -90,7 +90,7 @@ export class Descriptor {
     ];
 
     for (const { defaultValue, key, name } of boolOptions) {
-      const value = opts[key];
+      const value = (opts as any)[key];
 
       if (typeof value === "boolean") {
         const isDefault = value === defaultValue;

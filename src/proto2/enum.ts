@@ -1,9 +1,9 @@
-import type { EnumDescriptorProto } from "@bufbuild/protobuf/wkt";
+import type { EnumDescriptorProto, EnumOptions, EnumValueOptions } from "@bufbuild/protobuf/wkt";
 
 export class EnumType {
   name?: string;
-  value: { name?: string; number?: number; options?: any }[];
-  options?: any; // EnumOptions
+  value: { name?: string; number?: number; options?: EnumValueOptions }[];
+  options?: EnumOptions;
   reservedRange: { start?: number; end?: number }[];
   reservedName: string[];
 

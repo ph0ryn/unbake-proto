@@ -1,7 +1,7 @@
 import { OUT_DEFAULT } from "./format";
 import { shortenTypeName, type TypeScope } from "./scope";
 
-import type { FieldDescriptorProto } from "@bufbuild/protobuf/wkt";
+import type { FieldDescriptorProto, FieldOptions } from "@bufbuild/protobuf/wkt";
 
 export type { TypeScope };
 
@@ -25,7 +25,7 @@ export class FieldDescriptor {
   defaultValue?: string;
   oneofIndex?: number;
   jsonName?: string;
-  options?: any; // FieldOptions
+  options?: FieldOptions;
 
   constructor(proto: FieldDescriptorProto) {
     this.name = proto.name;
@@ -187,8 +187,8 @@ export class FieldDescriptor {
         parts.push(`edition_removed: ${this.formatEdition(fs.editionRemoved)}`);
       }
 
-      if (fs.removalError) {
-        parts.push(`removal_error: "${fs.removalError}"`);
+      if ((fs as any).removalError) {
+        parts.push(`removal_error: "${(fs as any).removalError}"`);
       }
 
       if (parts.length > 0) {

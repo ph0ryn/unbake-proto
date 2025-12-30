@@ -1,11 +1,16 @@
 import { shortenTypeName, type TypeScope } from "./scope";
 
-import type { MethodDescriptorProto, ServiceDescriptorProto } from "@bufbuild/protobuf/wkt";
+import type {
+  MethodDescriptorProto,
+  MethodOptions,
+  ServiceDescriptorProto,
+  ServiceOptions,
+} from "@bufbuild/protobuf/wkt";
 
 export class ServiceDescriptor {
   name?: string;
   method: MethodDescriptor[];
-  options?: any; // ServiceOptions
+  options?: ServiceOptions;
 
   constructor(proto: ServiceDescriptorProto) {
     this.name = proto.name;
@@ -25,7 +30,7 @@ export class MethodDescriptor {
   name?: string;
   inputType?: string;
   outputType?: string;
-  options?: any; // MethodOptions
+  options?: MethodOptions;
   clientStreaming?: boolean;
   serverStreaming?: boolean;
 
