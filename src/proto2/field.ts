@@ -79,7 +79,7 @@ export class FieldDescriptor {
   getOptions(): FieldOptionEntry[] {
     const entries: FieldOptionEntry[] = [];
 
-    // default_value (proto2 specific)
+    // Default_value (proto2 specific)
     if (this.defaultValue !== undefined && (OUT_DEFAULT || this.defaultValue !== "")) {
       // Only output default if it's a scalar type or enum
       const isScalarOrEnum =
@@ -98,7 +98,7 @@ export class FieldDescriptor {
             entries.push({ name: "default", value: `"${this.defaultValue}"` });
           }
         } else {
-          // numeric, bool, or enum
+          // Numeric, bool, or enum
           if (this.defaultValue !== "" || OUT_DEFAULT) {
             let val = this.defaultValue;
 
@@ -120,17 +120,17 @@ export class FieldDescriptor {
       return entries;
     }
 
-    // packed option
+    // Packed option
     if (opts.packed === true) {
       entries.push({ name: "packed", value: "true" });
     }
 
-    // deprecated option
+    // Deprecated option
     if (opts.deprecated === true) {
       entries.push({ name: "deprecated", value: "true" });
     }
 
-    // retention enum (OptionRetention: 0=UNKNOWN, 1=RUNTIME, 2=SOURCE)
+    // Retention enum (OptionRetention: 0=UNKNOWN, 1=RUNTIME, 2=SOURCE)
     if (opts.retention !== undefined && opts.retention !== 0) {
       const retentionMap: Record<number, string> = {
         1: "RETENTION_RUNTIME",
@@ -143,7 +143,7 @@ export class FieldDescriptor {
       }
     }
 
-    // targets - repeated OptionTargetType
+    // Targets - repeated OptionTargetType
     if (opts.targets && Array.isArray(opts.targets)) {
       const targetMap: Record<number, string> = {
         1: "TARGET_TYPE_FILE",
@@ -166,7 +166,7 @@ export class FieldDescriptor {
       }
     }
 
-    // feature_support - nested message
+    // Feature_support - nested message
     if (opts.featureSupport) {
       const parts: string[] = [];
       const fs = opts.featureSupport;
@@ -196,7 +196,7 @@ export class FieldDescriptor {
       }
     }
 
-    // edition_defaults - repeated nested message
+    // Edition_defaults - repeated nested message
     if (opts.editionDefaults && Array.isArray(opts.editionDefaults)) {
       for (const ed of opts.editionDefaults) {
         const parts: string[] = [];

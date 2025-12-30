@@ -3,8 +3,8 @@
  * Used to determine the shortest valid type name.
  */
 export interface TypeScope {
-  package: string; // e.g., "playground.v2"
-  messagePath: string[]; // e.g., ["Envelope", "Actor"] for nested messages
+  package: string; // E.g., "playground.v2"
+  messagePath: string[]; // E.g., ["Envelope", "Actor"] for nested messages
 }
 
 /**

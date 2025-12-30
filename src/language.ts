@@ -36,22 +36,22 @@ function parsePythonBinaryString(str: string): Uint8Array {
       bytes.push(parseInt(hex, 16));
       i += 4;
     } else if (str[i] === "\\" && str[i + 1] === "n") {
-      bytes.push(0x0a); // newline
+      bytes.push(0x0a); // Newline
       i += 2;
     } else if (str[i] === "\\" && str[i + 1] === "r") {
-      bytes.push(0x0d); // carriage return
+      bytes.push(0x0d); // Carriage return
       i += 2;
     } else if (str[i] === "\\" && str[i + 1] === "t") {
-      bytes.push(0x09); // tab
+      bytes.push(0x09); // Tab
       i += 2;
     } else if (str[i] === "\\" && str[i + 1] === "\\") {
-      bytes.push(0x5c); // backslash
+      bytes.push(0x5c); // Backslash
       i += 2;
     } else if (str[i] === "\\" && str[i + 1] === "'") {
-      bytes.push(0x27); // single quote
+      bytes.push(0x27); // Single quote
       i += 2;
     } else if (str[i] === "\\" && str[i + 1] === '"') {
-      bytes.push(0x22); // double quote
+      bytes.push(0x22); // Double quote
       i += 2;
     } else {
       bytes.push(str.charCodeAt(i));

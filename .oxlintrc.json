@@ -25,6 +25,7 @@
   "rules": {
     "func-style": "off",
     "id-length": "off",
+    "max-statements": "off",
     "no-inferrable-types": "off",
     "no-magic-numbers": "off",
     "prefer-destructuring": "off",

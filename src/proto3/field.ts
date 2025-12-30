@@ -84,17 +84,17 @@ export class FieldDescriptor {
       return entries;
     }
 
-    // packed option
+    // Packed option
     if (opts.packed === true) {
       entries.push({ name: "packed", value: "true" });
     }
 
-    // deprecated option
+    // Deprecated option
     if (opts.deprecated === true) {
       entries.push({ name: "deprecated", value: "true" });
     }
 
-    // retention enum
+    // Retention enum
     if (opts.retention !== undefined && opts.retention !== 0) {
       const retentionMap: Record<number, string> = {
         1: "RETENTION_RUNTIME",
@@ -107,7 +107,7 @@ export class FieldDescriptor {
       }
     }
 
-    // targets - repeated OptionTargetType
+    // Targets - repeated OptionTargetType
     if (opts.targets && Array.isArray(opts.targets)) {
       const targetMap: Record<number, string> = {
         1: "TARGET_TYPE_FILE",
@@ -130,7 +130,7 @@ export class FieldDescriptor {
       }
     }
 
-    // feature_support - nested message
+    // Feature_support - nested message
     if (opts.featureSupport) {
       const parts: string[] = [];
       const fs = opts.featureSupport;
@@ -160,7 +160,7 @@ export class FieldDescriptor {
       }
     }
 
-    // edition_defaults - repeated nested message
+    // Edition_defaults - repeated nested message
     if (opts.editionDefaults && Array.isArray(opts.editionDefaults)) {
       for (const ed of opts.editionDefaults) {
         const parts: string[] = [];

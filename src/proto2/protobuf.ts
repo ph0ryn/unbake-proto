@@ -99,7 +99,7 @@ export class Descriptor {
       }
     }
 
-    // optimize_for enum (default: SPEED = 1)
+    // Optimize_for enum (default: SPEED = 1)
     if (opts.optimizeFor !== undefined) {
       const optimizeMap: Record<number, string> = {
         1: "SPEED",

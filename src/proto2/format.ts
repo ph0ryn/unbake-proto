@@ -138,7 +138,7 @@ export class Formatter {
       this.indent();
 
       for (const fld of group.fields) {
-        // oneof fields don't have labels (optional/required/repeated)
+        // Oneof fields don't have labels (optional/required/repeated)
         this.printField(fld, { isOneofField: true });
       }
 
@@ -289,7 +289,7 @@ export class Formatter {
 
     const { prefix: stylePrefix, typeString } = field.getStyle(scope);
     const options = this.formatFieldOptions(field);
-    // oneof fields don't have labels (optional/required/repeated)
+    // Oneof fields don't have labels (optional/required/repeated)
     let prefix = stylePrefix;
 
     if (isOneofField) {
