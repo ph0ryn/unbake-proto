@@ -1,41 +1,40 @@
 {
   "name": "unbake-proto",
   "version": "1.1.0",
-  "author": "ph0ryn",
   "description": "Decompile baked protobuf descriptors into human-readable working .proto",
-  "type": "module",
-  "license": "MIT",
-  "bin": {
-    "unbake-proto": "src/index.ts"
-  },
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/ph0ryn/unbake-proto.git"
-  },
-  "files": [
-    "dist"
-  ],
   "keywords": [
     "protobuf",
     "protoc"
   ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ph0ryn/unbake-proto.git"
+  },
+  "license": "MIT",
+  "author": "ph0ryn",
+  "type": "module",
   "main": "dist/index.js",
   "module": "dist/index.js",
-  "publishConfig": {
-    "bin": {
-      "unbake-proto": "dist/index.js"
-    }
+  "bin": {
+    "unbake-proto": "src/index.ts"
   },
+  "files": [
+    "dist"
+  ],
   "scripts": {
-    "lint": "bunx oxlint --type-aware",
-    "format": "bun run lint --fix . ; bunx oxfmt . ; bunx eslint --fix .",
     "check": "bunx tsc --noEmit",
-    "precommit": "bun run check && bun run format",
-    "prepack": "bun run precommit && clean-pkg-json -r dependencies -r peerDependencies && bun run build",
+    "format": "pnpm run lint --fix . ; bunx oxfmt . ; bunx eslint --fix .",
+    "preinstall": "npx only-allow pnpm",
+    "lint": "bunx oxlint --type-aware",
+    "prepack": "pnpm run precommit && clean-pkg-json -r dependencies -r peerDependencies && pnpm run build",
     "postpack": "git checkout package.json",
-    "unbake": "bun run src/index.ts",
-    "test:proto2": "protoc --descriptor_set_out=test/descriptor.pb --include_imports descriptor.proto && bun run unbake test/descriptor.pb",
-    "test:proto3": "protoc --descriptor_set_out=test/comprehensive.pb --include_imports test/comprehensive.proto && bun run unbake test/comprehensive.pb"
+    "precommit": "pnpm run check && pnpm run format",
+    "test:proto2": "protoc --descriptor_set_out=test/descriptor.pb --include_imports test/descriptor.proto && bun run unbake test/descriptor.pb",
+    "test:proto3": "protoc --descriptor_set_out=test/comprehensive.pb --include_imports test/comprehensive.proto && bun run unbake test/comprehensive.pb",
+    "unbake": "bun run src/index.ts"
+  },
+  "dependencies": {
+    "@bufbuild/protobuf": "^2.10.2"
   },
   "devDependencies": {
     "@stylistic/eslint-plugin": "^5.6.1",
@@ -47,12 +46,17 @@
     "oxfmt": "^0.16.0",
     "oxlint": "^1.32.0",
     "oxlint-tsgolint": "^0.9.1",
+    "sort-package-json": "^3.6.0",
     "typescript-eslint": "^8.49.0"
   },
   "peerDependencies": {
     "typescript": "^5"
   },
-  "dependencies": {
-    "@bufbuild/protobuf": "^2.10.2"
+  "packageManager": "pnpm@10.16.1",
+  "publishConfig": {
+    "access": "public",
+    "bin": {
+      "unbake-proto": "dist/index.js"
+    }
   }
 }
