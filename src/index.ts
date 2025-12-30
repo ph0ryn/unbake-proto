@@ -5,20 +5,32 @@ import { dirname, join } from "path";
 import { fromBinary } from "@bufbuild/protobuf";
 import { FileDescriptorSetSchema } from "@bufbuild/protobuf/wkt";
 
+import * as Language from "./language";
 import { Formatter as Formatter2 } from "./proto2/format";
 import { Descriptor as Descriptor2 } from "./proto2/protobuf";
 import { Formatter as Formatter3 } from "./proto3/format";
 import { Descriptor as Descriptor3 } from "./proto3/protobuf";
 
-const inputPath = process.argv[2];
-const outputPath = process.argv[3];
+// Parse arguments
+const args = process.argv.slice(2);
+const pythonFlag = args.includes("--python");
+const positionalArgs = args.filter((arg) => !arg.startsWith("--"));
+
+const inputPath = positionalArgs[0];
+const outputPath = positionalArgs[1];
 
 if (!inputPath) {
-  console.error("Usage: bun run unbake <input> [output_dir]");
+  console.error("Usage: bun run unbake <input> [output_dir] [--python]");
   process.exit(1);
 }
 
-const buffer = readFileSync(inputPath);
+let buffer: Uint8Array = readFileSync(inputPath);
+
+if (pythonFlag) {
+  const code = buffer.toString();
+
+  buffer = Language.python(code);
+}
 
 const fds = fromBinary(FileDescriptorSetSchema, buffer);
 

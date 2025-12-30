@@ -1,6 +1,6 @@
 {
   "name": "unbake-proto",
-  "version": "1.0.3",
+  "version": "1.1.0",
   "author": "ph0ryn",
   "description": "Decompile baked protobuf descriptors into human-readable working .proto",
   "type": "module",

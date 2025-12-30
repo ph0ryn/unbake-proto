@@ -11,7 +11,21 @@
             "stopOnEntry": false,
             "watchMode": false,
             "args": [
-                "test/schema.pb"
+                "test/descriptor.pb"
+            ]
+        },
+        {
+            "type": "bun",
+            "internalConsoleOptions": "neverOpen",
+            "request": "launch",
+            "name": "Debug Python",
+            "program": "src/index.ts",
+            "cwd": "${workspaceFolder}",
+            "stopOnEntry": false,
+            "watchMode": false,
+            "args": [
+                "test/descriptor_pb2.py",
+                "--python"
             ]
         }
     ]
