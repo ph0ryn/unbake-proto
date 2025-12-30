@@ -20,7 +20,16 @@ const inputPath = positionalArgs[0];
 const outputPath = positionalArgs[1];
 
 if (!inputPath) {
-  console.error("Usage: bun run unbake <input> [output_dir] [--python]");
+  console.error(`Usage:
+  unbake-proto <input> [output_dir] [options]
+
+Arguments:
+  input        Path to compiled descriptor file
+  output_dir   Output directory (optional, prints to stdout if omitted)
+
+Options:
+  --python     Use a Python file as input`);
+
   process.exit(1);
 }
 
