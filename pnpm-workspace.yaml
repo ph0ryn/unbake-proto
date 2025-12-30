@@ -1,0 +1,5 @@
+enablePrePostScripts: true
+
+minimumReleaseAge: 2880
+
+shellEmulator: true

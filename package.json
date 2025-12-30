@@ -13,8 +13,12 @@
   "license": "MIT",
   "author": "ph0ryn",
   "type": "module",
-  "main": "dist/index.js",
-  "module": "dist/index.js",
+  "exports": {
+    ".": "./src/index.ts",
+    "./package.json": "./package.json"
+  },
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
   "bin": {
     "unbake-proto": "src/index.ts"
   },
@@ -22,16 +26,24 @@
     "dist"
   ],
   "scripts": {
-    "check": "bunx tsc --noEmit",
-    "format": "pnpm run lint --fix . ; bunx oxfmt . ; bunx eslint --fix .",
+    "build": "tsdown",
+    "format": "pnpm run lint --fix . ; oxfmt . ; eslint --fix .",
     "preinstall": "npx only-allow pnpm",
-    "lint": "bunx oxlint --type-aware",
-    "prepack": "pnpm run precommit && clean-pkg-json -r dependencies -r peerDependencies && pnpm run build",
-    "postpack": "git checkout package.json",
-    "precommit": "pnpm run check && pnpm run format",
-    "test:proto2": "protoc --descriptor_set_out=test/descriptor.pb --include_imports test/descriptor.proto && bun run unbake test/descriptor.pb",
-    "test:proto3": "protoc --descriptor_set_out=test/comprehensive.pb --include_imports test/comprehensive.proto && bun run unbake test/comprehensive.pb",
-    "unbake": "bun run src/index.ts"
+    "lint": "oxlint --type-aware",
+    "prepack": "pnpm run prepare && pnpm run build && clean-pkg-json -r dependencies -r peerDependencies",
+    "prepare": "pnpm run typecheck && pnpm run format",
+    "test:proto2": "protoc --descriptor_set_out=test/descriptor.pb --include_imports test/descriptor.proto && pnpm unbake test/descriptor.pb",
+    "test:proto3": "protoc --descriptor_set_out=test/comprehensive.pb --include_imports test/comprehensive.proto && pnpm unbake test/comprehensive.pb",
+    "typecheck": "tsgo -p . --noEmit",
+    "unbake": "bun src/index.ts"
+  },
+  "lint-staged": {
+    "*": [
+      "pnpm run format"
+    ],
+    "package.json": [
+      "sort-package-json"
+    ]
   },
   "dependencies": {
     "@bufbuild/protobuf": "^2.10.2"
@@ -39,14 +51,17 @@
   "devDependencies": {
     "@stylistic/eslint-plugin": "^5.6.1",
     "@types/bun": "latest",
+    "@typescript/native-preview": "7.0.0-dev.20251228.1",
     "clean-pkg-json": "^1.3.0",
     "eslint": "^9.39.1",
     "eslint-plugin-import-x": "^4.16.1",
     "eslint-plugin-oxlint": "^1.32.0",
+    "lint-staged": "^16.2.7",
     "oxfmt": "^0.16.0",
     "oxlint": "^1.32.0",
     "oxlint-tsgolint": "^0.9.1",
     "sort-package-json": "^3.6.0",
+    "tsdown": "^0.18.3",
     "typescript-eslint": "^8.49.0"
   },
   "peerDependencies": {
@@ -57,6 +72,10 @@
     "access": "public",
     "bin": {
       "unbake-proto": "dist/index.js"
+    },
+    "exports": {
+      ".": "./dist/index.js",
+      "./package.json": "./package.json"
     }
   }
 }
