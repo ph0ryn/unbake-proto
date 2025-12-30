@@ -17,8 +17,8 @@
     ".": "./src/index.ts",
     "./package.json": "./package.json"
   },
-  "main": "./dist/index.js",
-  "module": "./dist/index.js",
+  "main": "./dist/index.mjs",
+  "module": "./dist/index.mjs",
   "bin": {
     "unbake-proto": "src/index.ts"
   },
@@ -32,8 +32,8 @@
     "lint": "oxlint --type-aware",
     "prepack": "pnpm run precommit && pnpm run build && clean-pkg-json -r dependencies -r peerDependencies",
     "precommit": "pnpm run typecheck && pnpm run format",
-    "test:proto2": "protoc --descriptor_set_out=test/descriptor.pb --include_imports test/descriptor.proto && pnpm unbake test/descriptor.pb",
-    "test:proto3": "protoc --descriptor_set_out=test/comprehensive.pb --include_imports test/comprehensive.proto && pnpm unbake test/comprehensive.pb",
+    "test:proto2": "pnpx protoc --descriptor_set_out=test/descriptor.pb --include_imports test/descriptor.proto && pnpm unbake test/descriptor.pb",
+    "test:proto3": "pnpx protoc --descriptor_set_out=test/comprehensive.pb --include_imports test/comprehensive.proto && pnpm unbake test/comprehensive.pb",
     "typecheck": "tsgo -p . --noEmit",
     "unbake": "bun src/index.ts"
   },
@@ -71,10 +71,10 @@
   "publishConfig": {
     "access": "public",
     "bin": {
-      "unbake-proto": "dist/index.js"
+      "unbake-proto": "dist/index.mjs"
     },
     "exports": {
-      ".": "./dist/index.js",
+      ".": "./dist/index.mjs",
       "./package.json": "./package.json"
     }
   }

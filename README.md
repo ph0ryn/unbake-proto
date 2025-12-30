@@ -30,3 +30,7 @@ npx unbake-proto baked.pb > unbaked.proto
 ```
 
 there should be no difference between `original.proto` and `unbaked.proto` !
+
+## development
+
+requires `pnpm`
