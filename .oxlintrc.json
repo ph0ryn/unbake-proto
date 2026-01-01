@@ -11,9 +11,6 @@
     "restriction": "off",
     "nursery": "warn"
   },
-  "globals": {
-    "Bun": "readonly"
-  },
   "env": {
     "node": true
   },

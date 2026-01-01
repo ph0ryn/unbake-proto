@@ -7,54 +7,12 @@ break tasks into small goals for more efficient development
 check the output is expected
 
 ```shell
-bun run test
+pnpm run test:proto2
+pnpm run test:proto3
 ```
 
 if not, go back to edit until it is expected
 else, commit
-
-## pre-commit
-
-```shell
-bun run precommit
-```
-
-fix every error and warning  
-resolved everything. then, commit
-
-```shell
-git add .
-git commit -m "message"
-```
-
-## structure
-
-```shell
-src
-├── index.ts
-├── proto2
-│   ├── enum.ts
-│   ├── field.ts
-│   ├── format.ts
-│   ├── header.ts
-│   ├── message.ts
-│   ├── oneof.ts
-│   ├── option.ts
-│   ├── protobuf.ts
-│   ├── scope.ts
-│   └── service.ts
-└── proto3
-    ├── enum.ts
-    ├── field.ts
-    ├── format.ts
-    ├── header.ts
-    ├── message.ts
-    ├── oneof.ts
-    ├── option.ts
-    ├── protobuf.ts
-    ├── scope.ts
-    └── service.ts
-```
 
 ## workflow
 
