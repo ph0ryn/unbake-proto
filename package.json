@@ -29,7 +29,7 @@
     "preinstall": "npx only-allow pnpm",
     "postinstall": "git config core.hooksPath .githooks",
     "lint": "eslint && oxlint --type-aware --type-check",
-    "prepack": "pnpm run precommit && pnpm run build && clean-pkg-json -r dependencies -r peerDependencies",
+    "prepack": "pnpm run precommit && sort-package-json && pnpm run build && clean-pkg-json -r devDependencies -r peerDependencies",
     "precommit": "pnpm run fix && eslint",
     "test:proto2": "pnpx protoc --descriptor_set_out=test/descriptor.pb --include_imports test/descriptor.proto && pnpm unbake test/descriptor.pb",
     "test:proto3": "pnpx protoc --descriptor_set_out=test/comprehensive.pb --include_imports test/comprehensive.proto && pnpm unbake test/comprehensive.pb",
