@@ -65,7 +65,7 @@ function parsePythonBinaryString(str: string): Uint8Array {
 export function python(code: string): Uint8Array {
   const bstring = RegExp("b'(.+)'").exec(code);
 
-  if (!bstring || !bstring[1]) {
+  if (!bstring?.[1]) {
     throw new Error("Invalid python source");
   }
 

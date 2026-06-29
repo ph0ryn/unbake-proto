@@ -1,6 +1,6 @@
 # Agent rule
 
-break tasks into small goals for more efficient development  
+break tasks into small goals for more efficient development
 
 ## post-edit
 

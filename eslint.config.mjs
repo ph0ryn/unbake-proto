@@ -1,8 +1,6 @@
-import { defineConfig } from "eslint/config";
-import importX from "eslint-plugin-import-x";
-import stylistic from "@stylistic/eslint-plugin";
-import tseslint from "typescript-eslint";
 import oxlint from "eslint-plugin-oxlint";
+import { defineConfig } from "eslint/config";
+import tseslint from "typescript-eslint";
 
 export default defineConfig(
   {
@@ -18,63 +16,35 @@ export default defineConfig(
       },
     },
     plugins: {
-      "@stylistic": stylistic,
       "@typescript-eslint": tseslint.plugin,
-      "import-x": importX,
     },
     rules: {
-      "no-multiple-empty-lines": [
-        "error",
-        {
-          max: 1,
-          maxEOF: 0,
-        },
-      ],
-
-      "@stylistic/padding-line-between-statements": [
-        "error",
-        {
-          blankLine: "always",
-          prev: "*",
-          next: ["return", "multiline-expression", "block-like", "try", "throw"],
-        },
-        {
-          blankLine: "always",
-          prev: ["multiline-expression", "block-like", "const", "let"],
-          next: "*",
-        },
-        {
-          blankLine: "any",
-          prev: ["const", "let"],
-          next: ["const", "let"],
-        },
-      ],
-
       "@typescript-eslint/naming-convention": [
         "error",
         {
-          selector: "class",
           format: ["StrictPascalCase"],
+          selector: "typeLike",
         },
         {
-          selector: "variable",
           format: ["strictCamelCase", "UPPER_CASE"],
+          modifiers: ["const"],
+          selector: "variable",
         },
         {
-          selector: "parameter",
           format: ["strictCamelCase"],
+          selector: "variable",
         },
-      ],
-
-      "import-x/order": [
-        "error",
         {
-          alphabetize: { order: "asc" },
-          groups: ["builtin", "external", "internal", ["parent", "sibling", "index"], "type"],
-          "newlines-between": "always",
+          format: ["strictCamelCase"],
+          selector: "function",
+        },
+        {
+          format: ["strictCamelCase"],
+          leadingUnderscore: "allow",
+          selector: "parameter",
         },
       ],
     },
   },
-  oxlint.buildFromOxlintConfigFile("./.oxlintrc.json"),
+  oxlint.buildFromOxlintConfigFile("./oxlint.config.ts"),
 );

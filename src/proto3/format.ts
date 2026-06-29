@@ -8,10 +8,13 @@ export const OUT_DEFAULT = false;
 
 export class Formatter {
   private buffer: string[] = [];
+  private readonly descriptor: Descriptor;
   private indentLevel = 0;
   private messagePath: string[] = [];
 
-  constructor(private descriptor: Descriptor) {}
+  constructor(descriptor: Descriptor) {
+    this.descriptor = descriptor;
+  }
 
   format(): string {
     this.buffer = [];

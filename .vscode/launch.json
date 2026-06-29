@@ -1,32 +1,27 @@
 {
-    "version": "0.2.0",
-    "configurations": [
-        {
-            "type": "bun",
-            "internalConsoleOptions": "neverOpen",
-            "request": "launch",
-            "name": "Debug File",
-            "program": "src/index.ts",
-            "cwd": "${workspaceFolder}",
-            "stopOnEntry": false,
-            "watchMode": false,
-            "args": [
-                "test/descriptor.pb"
-            ]
-        },
-        {
-            "type": "bun",
-            "internalConsoleOptions": "neverOpen",
-            "request": "launch",
-            "name": "Debug Python",
-            "program": "src/index.ts",
-            "cwd": "${workspaceFolder}",
-            "stopOnEntry": false,
-            "watchMode": false,
-            "args": [
-                "test/descriptor_pb2.py",
-                "--python"
-            ]
-        }
-    ]
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "type": "bun",
+      "internalConsoleOptions": "neverOpen",
+      "request": "launch",
+      "name": "Debug File",
+      "program": "src/index.ts",
+      "cwd": "${workspaceFolder}",
+      "stopOnEntry": false,
+      "watchMode": false,
+      "args": ["test/descriptor.pb"]
+    },
+    {
+      "type": "bun",
+      "internalConsoleOptions": "neverOpen",
+      "request": "launch",
+      "name": "Debug Python",
+      "program": "src/index.ts",
+      "cwd": "${workspaceFolder}",
+      "stopOnEntry": false,
+      "watchMode": false,
+      "args": ["test/descriptor_pb2.py", "--python"]
+    }
+  ]
 }

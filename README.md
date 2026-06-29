@@ -16,8 +16,8 @@ npx unbake-proto <input> [out_folder] # output to file(s)
 
 ### options
 
-| Option | Description |
-| --- | --- |
+| Option     | Description                |
+| ---------- | -------------------------- |
 | `--python` | Use a Python file as input |
 
 ## try
