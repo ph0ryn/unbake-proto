@@ -3,7 +3,11 @@ import { existsSync, mkdirSync, readFileSync, writeFileSync } from "fs";
 import { dirname, join } from "path";
 
 import { fromBinary } from "@bufbuild/protobuf";
-import { FileDescriptorSetSchema } from "@bufbuild/protobuf/wkt";
+import {
+  FileDescriptorProtoSchema,
+  FileDescriptorSetSchema,
+  type FileDescriptorProto,
+} from "@bufbuild/protobuf/wkt";
 
 import * as Language from "./language";
 import { Formatter as Formatter2 } from "./proto2/format";
@@ -14,6 +18,7 @@ import { Descriptor as Descriptor3 } from "./proto3/protobuf";
 // Parse arguments
 const args = process.argv.slice(2);
 const pythonFlag = args.includes("--python");
+const singleFlag = args.includes("--single");
 const positionalArgs = args.filter((arg) => !arg.startsWith("--"));
 
 const inputPath = positionalArgs[0];
@@ -28,6 +33,7 @@ Arguments:
   output_dir   Output directory (optional, prints to stdout if omitted)
 
 Options:
+  --single     Use a single FileDescriptorProto file as input
   --python     Use a Python file as input`);
 
   process.exit(1);
@@ -36,12 +42,27 @@ Options:
 let buffer: Uint8Array = readFileSync(inputPath);
 
 if (pythonFlag) {
+  if (singleFlag) {
+    console.warn("Warning: --single is ignored when --python is specified");
+  }
+
   const code = buffer.toString();
 
   buffer = Language.python(code);
 }
 
-const fds = fromBinary(FileDescriptorSetSchema, buffer);
+function parseDescriptorFiles(
+  descriptor: Uint8Array,
+  useSingleDescriptor: boolean,
+): FileDescriptorProto[] {
+  if (useSingleDescriptor) {
+    return [fromBinary(FileDescriptorProtoSchema, descriptor)];
+  }
+
+  return fromBinary(FileDescriptorSetSchema, descriptor).file;
+}
+
+const files = parseDescriptorFiles(buffer, singleFlag && !pythonFlag);
 
 /**
  * Generates the output file path based on the package and file name.
@@ -68,7 +89,7 @@ function getOutputFilePath(
   return join(outputDir, packagePath, "unnamed.proto");
 }
 
-function formatFile(file: (typeof fds.file)[0]): string {
+function formatFile(file: FileDescriptorProto): string {
   // Empty syntax or "proto2" means proto2 (proto2 is default when syntax is not specified)
   if (file.syntax === "proto3") {
     const descriptor = new Descriptor3(file);
@@ -83,7 +104,7 @@ function formatFile(file: (typeof fds.file)[0]): string {
   }
 }
 
-for (const file of fds.file) {
+for (const file of files) {
   const content = formatFile(file);
 
   if (outputPath) {
