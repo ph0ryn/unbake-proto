@@ -63,13 +63,14 @@ function parsePythonBinaryString(str: string): Uint8Array {
 }
 
 export function python(code: string): Uint8Array {
-  const bstring = RegExp("b'(.+)'").exec(code);
+  const bstring = /b'(?<binary>.+)'/.exec(code);
+  const binarySource = bstring?.groups?.["binary"];
 
-  if (!bstring?.[1]) {
+  if (!binarySource) {
     throw new Error("Invalid python source");
   }
 
-  const binary = parsePythonBinaryString(bstring[1]);
+  const binary = parsePythonBinaryString(binarySource);
   const header = generateHeader(binary);
 
   return Buffer.concat([header, binary]);

@@ -1,6 +1,6 @@
 {
   "name": "unbake-proto",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "description": "Decompile baked protobuf descriptors into human-readable working .proto",
   "keywords": [
     "protobuf",

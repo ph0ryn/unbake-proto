@@ -1,7 +1,7 @@
 import { defineConfig } from "oxlint";
 
 interface ImportMeta {
-  resolve(specifier: string): string;
+  resolve: (specifier: string) => string;
 }
 
 export default defineConfig({
