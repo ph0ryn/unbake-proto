@@ -15,40 +15,177 @@ import { Descriptor as Descriptor2 } from "./proto2/protobuf";
 import { Formatter as Formatter3 } from "./proto3/format";
 import { Descriptor as Descriptor3 } from "./proto3/protobuf";
 
-// Parse arguments
-const args = process.argv.slice(2);
-const pythonFlag = args.includes("--python");
-const singleFlag = args.includes("--single");
-const positionalArgs = args.filter((arg) => !arg.startsWith("--"));
+type InputSource =
+  | {
+      type: "file";
+      path: string;
+    }
+  | {
+      type: "base64";
+      value: string;
+    };
 
-const inputPath = positionalArgs[0];
-const outputPath = positionalArgs[1];
-
-if (!inputPath) {
-  console.error(`Usage:
-  unbake-proto <input> [output_dir] [options]
-
-Arguments:
-  input        Path to compiled descriptor file
-  output_dir   Output directory (optional, prints to stdout if omitted)
-
-Options:
-  --single     Use a single FileDescriptorProto file as input
-  --python     Use a Python file as input`);
-
-  process.exit(1);
+interface CliOptions {
+  inputSource: InputSource;
+  outputPath?: string;
+  python: boolean;
+  single: boolean;
 }
 
-let buffer: Uint8Array = readFileSync(inputPath);
+function usage(): string {
+  return `Usage:
+  unbake-proto -i <input> [options]
+  unbake-proto --from-base64 <base64> [options]
 
-if (pythonFlag) {
-  if (singleFlag) {
-    console.warn("Warning: --single is ignored when --python is specified");
+Input:
+  -i <input>              Path to compiled descriptor or Python source file
+  --from-base64 <base64>  Base64-encoded descriptor bytes
+
+Output:
+  -o <output>             Output file for --single/--python, output directory otherwise
+                           Omitted output prints to stdout
+
+Options:
+  --single                Use a single FileDescriptorProto file as input
+  --python                Use a Python file as input`;
+}
+
+function readRequiredValue(args: string[], index: number, optionName: string): string {
+  const value = args[index + 1];
+
+  if (value === undefined || value.startsWith("-")) {
+    throw new Error(`Missing value for ${optionName}`);
   }
 
-  const code = buffer.toString();
+  return value;
+}
 
-  buffer = Language.python(code);
+function parseCliOptions(args: string[]): CliOptions {
+  let inputSource: InputSource | undefined = undefined;
+  let outputPath: string | undefined = undefined;
+  let python = false;
+  let single = false;
+
+  for (let index = 0; index < args.length; index += 1) {
+    const arg = args[index];
+
+    if (arg === undefined) {
+      throw new Error("Unexpected empty argument");
+    }
+
+    switch (arg) {
+      case "-i": {
+        const path = readRequiredValue(args, index, "-i");
+
+        if (inputSource) {
+          throw new Error("Only one input source can be specified");
+        }
+
+        inputSource = {
+          path,
+          type: "file",
+        };
+
+        index += 1;
+        break;
+      }
+
+      case "--from-base64": {
+        const value = readRequiredValue(args, index, "--from-base64");
+
+        if (inputSource) {
+          throw new Error("Only one input source can be specified");
+        }
+
+        inputSource = {
+          type: "base64",
+          value,
+        };
+
+        index += 1;
+        break;
+      }
+
+      case "-o": {
+        if (outputPath !== undefined) {
+          throw new Error("-o can only be specified once");
+        }
+
+        outputPath = readRequiredValue(args, index, "-o");
+
+        index += 1;
+        break;
+      }
+
+      case "--python": {
+        python = true;
+        break;
+      }
+
+      case "--single": {
+        single = true;
+        break;
+      }
+
+      default: {
+        if (arg.startsWith("-")) {
+          throw new Error(`Unknown option: ${arg}`);
+        }
+
+        throw new Error(`Unexpected argument without option: ${arg}`);
+      }
+    }
+  }
+
+  if (!inputSource) {
+    throw new Error("Missing input source. Use -i or --from-base64");
+  }
+
+  if (single && python) {
+    throw new Error("--single cannot be used with --python");
+  }
+
+  if (inputSource.type === "base64" && python) {
+    throw new Error("--from-base64 cannot be used with --python");
+  }
+
+  return {
+    inputSource,
+    outputPath,
+    python,
+    single,
+  };
+}
+
+function getCliOptions(args: string[]): CliOptions {
+  try {
+    return parseCliOptions(args);
+  } catch (error) {
+    let message = String(error);
+
+    if (error instanceof Error) {
+      message = error.message;
+    }
+
+    console.error(`Error: ${message}\n\n${usage()}`);
+    process.exit(1);
+  }
+}
+
+const cliOptions = getCliOptions(process.argv.slice(2));
+
+function readInput(options: CliOptions): Uint8Array {
+  if (options.inputSource.type === "base64") {
+    return Buffer.from(options.inputSource.value, "base64");
+  }
+
+  const input = readFileSync(options.inputSource.path);
+
+  if (options.python) {
+    return Language.python(input.toString());
+  }
+
+  return input;
 }
 
 function parseDescriptorFiles(
@@ -62,7 +199,8 @@ function parseDescriptorFiles(
   return fromBinary(FileDescriptorSetSchema, descriptor).file;
 }
 
-const files = parseDescriptorFiles(buffer, singleFlag && !pythonFlag);
+const buffer = readInput(cliOptions);
+const files = parseDescriptorFiles(buffer, cliOptions.single);
 
 /**
  * Generates the output file path based on the package and file name.
@@ -104,22 +242,38 @@ function formatFile(file: FileDescriptorProto): string {
   }
 }
 
-for (const file of files) {
-  const content = formatFile(file);
+function writeOutputFile(filePath: string, content: string): void {
+  const dir = dirname(filePath);
 
-  if (outputPath) {
-    // Write to file based on package structure
-    const filePath = getOutputFilePath(outputPath, file.package, file.name);
-    const dir = dirname(filePath);
+  if (!existsSync(dir)) {
+    mkdirSync(dir, { recursive: true });
+  }
 
-    if (!existsSync(dir)) {
-      mkdirSync(dir, { recursive: true });
-    }
+  writeFileSync(filePath, content);
+  console.log(`Written: ${filePath}`);
+}
 
-    writeFileSync(filePath, content);
-    console.log(`Written: ${filePath}`);
-  } else {
-    // Output to console
+const formattedFiles = files.map((file) => ({
+  content: formatFile(file),
+  file,
+}));
+
+if (!cliOptions.outputPath) {
+  for (const { content } of formattedFiles) {
     console.log(content);
+  }
+} else if (cliOptions.single || cliOptions.python) {
+  const [formattedFile] = formattedFiles;
+
+  if (!formattedFile) {
+    throw new Error("No descriptor files found");
+  }
+
+  writeOutputFile(cliOptions.outputPath, formattedFile.content);
+} else {
+  for (const { content, file } of formattedFiles) {
+    const filePath = getOutputFilePath(cliOptions.outputPath, file.package, file.name);
+
+    writeOutputFile(filePath, content);
   }
 }
