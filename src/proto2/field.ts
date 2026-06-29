@@ -1,4 +1,3 @@
-import { OUT_DEFAULT } from "./format";
 import { shortenTypeName, type TypeScope } from "./scope";
 
 import type { FieldDescriptorProto, FieldOptions } from "@bufbuild/protobuf/wkt";
@@ -80,7 +79,7 @@ export class FieldDescriptor {
     const entries: FieldOptionEntry[] = [];
 
     // Default_value (proto2 specific)
-    if (this.defaultValue !== undefined && (OUT_DEFAULT || this.defaultValue !== "")) {
+    if (this.defaultValue !== undefined && this.defaultValue !== "") {
       // Only output default if it's a scalar type or enum
       const isScalarOrEnum =
         this.type !== undefined &&
@@ -89,27 +88,12 @@ export class FieldDescriptor {
         this.label !== 3; // REPEATED
 
       if (isScalarOrEnum) {
-        if (this.type === 9) {
-          // TYPE_STRING
+        if (this.type === 9 || this.type === 12) {
+          // TYPE_STRING or TYPE_BYTES
           entries.push({ name: "default", value: `"${this.defaultValue}"` });
-        } else if (this.type === 12) {
-          // TYPE_BYTES
-          if (this.defaultValue.length > 0 || OUT_DEFAULT) {
-            entries.push({ name: "default", value: `"${this.defaultValue}"` });
-          }
         } else {
           // Numeric, bool, or enum
-          if (this.defaultValue !== "" || OUT_DEFAULT) {
-            let val = this.defaultValue;
-
-            if (val === "") {
-              val = this.getDefaultValueForType();
-            }
-
-            if (val !== "") {
-              entries.push({ name: "default", value: val });
-            }
-          }
+          entries.push({ name: "default", value: this.defaultValue });
         }
       }
     }
@@ -131,7 +115,7 @@ export class FieldDescriptor {
     }
 
     // Retention enum (OptionRetention: 0=UNKNOWN, 1=RUNTIME, 2=SOURCE)
-    if (opts.retention !== undefined && opts.retention !== 0) {
+    if (opts.retention !== 0) {
       const retentionMap: Record<number, string> = {
         1: "RETENTION_RUNTIME",
         2: "RETENTION_SOURCE",
@@ -144,25 +128,23 @@ export class FieldDescriptor {
     }
 
     // Targets - repeated OptionTargetType
-    if (opts.targets && Array.isArray(opts.targets)) {
-      const targetMap: Record<number, string> = {
-        1: "TARGET_TYPE_FILE",
-        2: "TARGET_TYPE_EXTENSION_RANGE",
-        3: "TARGET_TYPE_MESSAGE",
-        4: "TARGET_TYPE_FIELD",
-        5: "TARGET_TYPE_ONEOF",
-        6: "TARGET_TYPE_ENUM",
-        7: "TARGET_TYPE_ENUM_ENTRY",
-        8: "TARGET_TYPE_SERVICE",
-        9: "TARGET_TYPE_METHOD",
-      };
+    const targetMap: Record<number, string> = {
+      1: "TARGET_TYPE_FILE",
+      2: "TARGET_TYPE_EXTENSION_RANGE",
+      3: "TARGET_TYPE_MESSAGE",
+      4: "TARGET_TYPE_FIELD",
+      5: "TARGET_TYPE_ONEOF",
+      6: "TARGET_TYPE_ENUM",
+      7: "TARGET_TYPE_ENUM_ENTRY",
+      8: "TARGET_TYPE_SERVICE",
+      9: "TARGET_TYPE_METHOD",
+    };
 
-      for (const target of opts.targets) {
-        const val = targetMap[target];
+    for (const target of opts.targets) {
+      const val = targetMap[target];
 
-        if (val) {
-          entries.push({ name: "targets", value: val });
-        }
+      if (val) {
+        entries.push({ name: "targets", value: val });
       }
     }
 
@@ -171,11 +153,11 @@ export class FieldDescriptor {
       const parts: string[] = [];
       const fs = opts.featureSupport;
 
-      if (fs.editionIntroduced !== undefined && fs.editionIntroduced !== 0) {
+      if (fs.editionIntroduced !== 0) {
         parts.push(`edition_introduced: ${this.formatEdition(fs.editionIntroduced)}`);
       }
 
-      if (fs.editionDeprecated !== undefined && fs.editionDeprecated !== 0) {
+      if (fs.editionDeprecated !== 0) {
         parts.push(`edition_deprecated: ${this.formatEdition(fs.editionDeprecated)}`);
       }
 
@@ -183,7 +165,7 @@ export class FieldDescriptor {
         parts.push(`deprecation_warning: "${fs.deprecationWarning}"`);
       }
 
-      if (fs.editionRemoved !== undefined && fs.editionRemoved !== 0) {
+      if (fs.editionRemoved !== 0) {
         parts.push(`edition_removed: ${this.formatEdition(fs.editionRemoved)}`);
       }
 
@@ -197,22 +179,16 @@ export class FieldDescriptor {
     }
 
     // Edition_defaults - repeated nested message
-    if (opts.editionDefaults && Array.isArray(opts.editionDefaults)) {
-      for (const ed of opts.editionDefaults) {
-        const parts: string[] = [];
+    for (const ed of opts.editionDefaults) {
+      const parts: string[] = [];
 
-        if (ed.edition !== undefined && ed.edition !== 0) {
-          parts.push(`edition: ${this.formatEdition(ed.edition)}`);
-        }
-
-        if (ed.value !== undefined) {
-          parts.push(`value: "${ed.value}"`);
-        }
-
-        if (parts.length > 0) {
-          entries.push({ name: "edition_defaults", value: `{ ${parts.join(", ")} }` });
-        }
+      if (ed.edition !== 0) {
+        parts.push(`edition: ${this.formatEdition(ed.edition)}`);
       }
+
+      parts.push(`value: "${ed.value}"`);
+
+      entries.push({ name: "edition_defaults", value: `{ ${parts.join(", ")} }` });
     }
 
     return entries;
@@ -302,30 +278,6 @@ export class FieldDescriptor {
         return "sint64";
       default:
         throw new Error(`Unexpected field type: ${this.type}`);
-    }
-  }
-
-  private getDefaultValueForType(): string {
-    switch (this.type) {
-      case 1: // DOUBLE
-      case 2: // FLOAT
-      case 3: // INT64
-      case 4: // UINT64
-      case 5: // INT32
-      case 6: // FIXED64
-      case 7: // FIXED32
-      case 13: // UINT32
-      case 15: // SFIXED32
-      case 16: // SFIXED64
-      case 17: // SINT32
-      case 18: // SINT64
-        return "0";
-      case 8: // BOOL
-        return "false";
-      case 14: // ENUM
-        return "";
-      default:
-        return "";
     }
   }
 }

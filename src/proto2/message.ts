@@ -40,8 +40,8 @@ export class MessageType {
     this.extensionRange = proto.extensionRange;
     this.oneofDecl = proto.oneofDecl.map((onf) => new OneofDescriptor(onf));
     this.options = proto.options;
-    this.reservedRange = proto.reservedRange ?? [];
-    this.reservedName = proto.reservedName ?? [];
+    this.reservedRange = proto.reservedRange;
+    this.reservedName = proto.reservedName;
   }
 
   /**
@@ -66,18 +66,16 @@ export class MessageType {
 
     const oneofGroups: OneofGroup[] = [];
 
-    if (this.oneofDecl) {
-      this.oneofDecl.forEach((oneof, index) => {
-        const fields = oneofFields.get(index);
+    this.oneofDecl.forEach((oneof, index) => {
+      const fields = oneofFields.get(index);
 
-        if (fields && fields.length > 0) {
-          oneofGroups.push({
-            fields,
-            name: oneof.name ?? "",
-          });
-        }
-      });
-    }
+      if (fields && fields.length > 0) {
+        oneofGroups.push({
+          fields,
+          name: oneof.name ?? "",
+        });
+      }
+    });
 
     return { oneofGroups, regularFields };
   }

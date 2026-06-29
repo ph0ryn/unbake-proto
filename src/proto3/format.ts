@@ -4,8 +4,6 @@ import type { MessageType } from "./message";
 import type { Descriptor } from "./protobuf";
 import type { ServiceDescriptor } from "./service";
 
-export const OUT_DEFAULT = false;
-
 export class Formatter {
   private buffer: string[] = [];
   private readonly descriptor: Descriptor;
@@ -150,7 +148,7 @@ export class Formatter {
     }
 
     // Extensions inside message
-    if (msg.extension && msg.extension.length > 0) {
+    if (msg.extension.length > 0) {
       this.emptyLine();
 
       for (const extension of msg.extension) {
@@ -163,7 +161,7 @@ export class Formatter {
     }
 
     // Extension Ranges
-    if (msg.extensionRange && msg.extensionRange.length > 0) {
+    if (msg.extensionRange.length > 0) {
       for (const range of msg.extensionRange) {
         let end: number | string = "max";
 
@@ -176,7 +174,7 @@ export class Formatter {
     }
 
     // Reserved ranges
-    if (msg.reservedRange && msg.reservedRange.length > 0) {
+    if (msg.reservedRange.length > 0) {
       const ranges = msg.reservedRange.map((range) => {
         if (range.start === range.end) {
           return String(range.start);
@@ -189,7 +187,7 @@ export class Formatter {
     }
 
     // Reserved names
-    if (msg.reservedName && msg.reservedName.length > 0) {
+    if (msg.reservedName.length > 0) {
       const names = msg.reservedName.map((name) => `"${name}"`);
 
       this.line(`reserved ${names.join(", ")};`);
@@ -353,7 +351,7 @@ export class Formatter {
     const options = this.descriptor.getFileOptions();
 
     for (const opt of options) {
-      if (OUT_DEFAULT || !opt.isDefault) {
+      if (!opt.isDefault) {
         this.line(`option ${opt.name} = ${opt.value};`);
       }
     }

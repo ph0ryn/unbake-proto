@@ -100,17 +100,15 @@ export class Descriptor {
     }
 
     // Optimize_for enum (default: SPEED = 1)
-    if (opts.optimizeFor !== undefined) {
-      const optimizeMap: Record<number, string> = {
-        1: "SPEED",
-        2: "CODE_SIZE",
-        3: "LITE_RUNTIME",
-      };
-      const enumVal = optimizeMap[opts.optimizeFor];
+    const optimizeMap: Record<number, string> = {
+      1: "SPEED",
+      2: "CODE_SIZE",
+      3: "LITE_RUNTIME",
+    };
+    const enumVal = optimizeMap[opts.optimizeFor];
 
-      if (enumVal) {
-        result.push({ isDefault: opts.optimizeFor === 1, name: "optimize_for", value: enumVal });
-      }
+    if (enumVal) {
+      result.push({ isDefault: opts.optimizeFor === 1, name: "optimize_for", value: enumVal });
     }
 
     return result;
